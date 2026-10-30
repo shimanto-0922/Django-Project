@@ -52,9 +52,11 @@ venv\Scripts\activate          # Windows  (macOS/Linux: source venv/bin/activate
 pip install -r requirements.txt
 copy .env.example .env         # macOS/Linux: cp .env.example .env
 python manage.py migrate
-python manage.py seed_demo     # optional: demo users, listings and photos
 python manage.py runserver
 ```
+
+The repository already includes `db.sqlite3` and `media/` with demo data. To rebuild the demo data from
+scratch, run `python manage.py seed_demo --reset`.
 
 Open http://127.0.0.1:8000.
 
