@@ -1,0 +1,52 @@
+{% load ghorify_tags humanize %}
+<article class="property-card">
+  <div class="thumb">
+    <a href="{{ p.get_absolute_url }}">
+      {% with img=p.primary_image %}
+        {% if img %}<img src="{{ img.image.url }}" alt="{{ p.title }}" loading="lazy">{% else %}<div class="placeholder-img"><i class="bi bi-house-door"></i></div>{% endif %}
+      {% endwith %}
+    </a>
+    <div class="chips">
+      {% if p.is_featured %}<span class="chip chip-featured"><i class="bi bi-star-fill"></i>Featured</span>{% endif %}
+      <span class="chip"><i class="bi {{ p.category|category_icon }}"></i>{{ p.get_category_display }}</span>
+      {% if match %}<span class="chip chip-match {{ match.level }}"><i class="bi bi-stars"></i>{{ match.percentage }}%</span>{% endif %}
+      {% if not p.is_available %}<span class="chip chip-dark">Rented</span>{% endif %}
+    </div>
+    {% if user.is_authenticated and user.is_tenant %}
+    <form method="post" action="{% url 'interactions:favourite_toggle' p.pk %}" class="fav">{% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button class="fav-btn" title="Save property"><i class="bi bi-heart"></i></button>
+    </form>
+    {% endif %}
+    {% with n=p.images.all|length %}{% if n > 1 %}<span class="chip chip-dark photo-count"><i class="bi bi-camera"></i>{{ n }}</span>{% endif %}{% endwith %}
+  </div>
+  <div class="body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+      <div class="price">{{ p.price|taka }} <small>/month</small></div>
+      {% if p.is_negotiable %}<span class="tag tag-nego">Negotiable</span>{% endif %}
+    </div>
+    <a href="{{ p.get_absolute_url }}" class="title mt-1">{{ p.title }}</a>
+    <div class="loc mt-1"><i class="bi bi-geo-alt"></i> {{ p.location }}, {{ p.city }}</div>
+    <div class="specs">
+      {% if p.is_commercial %}
+        {% if p.size %}<span><i class="bi bi-arrows-angle-expand"></i>{{ p.size|intcomma }} ft²</span>{% endif %}
+        <span><i class="bi bi-building"></i>{{ p.floor_label }}</span>
+        <span><i class="bi bi-droplet"></i>{{ p.bathrooms }} washroom{{ p.bathrooms|pluralize }}</span>
+      {% else %}
+        <span><i class="bi bi-door-closed"></i>{{ p.bedrooms }} Bed</span>
+        <span><i class="bi bi-droplet"></i>{{ p.bathrooms }} Bath</span>
+        {% if p.balconies and not compact %}<span><i class="bi bi-flower1"></i>{{ p.balconies }} Balcony</span>{% endif %}
+        {% if p.size %}<span><i class="bi bi-arrows-angle-expand"></i>{{ p.size|intcomma }} ft²</span>{% endif %}
+      {% endif %}
+    </div>
+    <div class="foot">
+      <span>
+        {% if p.tenant_gender == 'male' %}<span class="tag tag-male"><i class="bi bi-gender-male"></i>Male only</span>
+        {% elif p.tenant_gender == 'female' %}<span class="tag tag-female"><i class="bi bi-gender-female"></i>Female only</span>
+        {% elif p.landlord.landlord_profile.is_verified %}<span class="tag-verified fw-bold"><i class="bi bi-patch-check-fill"></i> Verified</span>
+        {% else %}{{ p.get_property_type_display }}{% endif %}
+      </span>
+      <span>{{ p.created_at|naturalday:'d M' }}</span>
+    </div>
+  </div>
+</article>

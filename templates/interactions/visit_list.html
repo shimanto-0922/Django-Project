@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}My visits{% endblock %}
+{% block content %}
+<div class="container" style="max-width:960px">
+  <div class="page-header"><span class="eyebrow">Tenant</span><h1>My property visits</h1></div>
+  {% for v in visits %}
+    <div class="request-card d-flex flex-wrap gap-3 align-items-center">
+      <div class="date-tile"><div class="d">{{ v.preferred_date|date:'d' }}</div><div class="m">{{ v.preferred_date|date:'M' }}</div></div>
+      <div class="flex-grow-1">
+        <a href="{{ v.property.get_absolute_url }}" class="fw-bold text-reset">{{ v.property.title }}</a>
+        <div class="small text-muted">{{ v.preferred_date|date:'l' }} · {{ v.get_time_slot_display }} · {{ v.property.location }}</div>
+        {% if v.landlord_note %}<div class="small mt-1"><i class="bi bi-chat-left-quote"></i> Landlord: {{ v.landlord_note }}</div>{% endif %}
+      </div>
+      <span class="status status-{{ v.status }}">{{ v.get_status_display }}</span>
+      <div class="d-flex gap-2">
+        {% if v.is_pending %}<a href="{% url 'interactions:visit_update' v.pk %}" class="btn btn-sm btn-soft">Reschedule</a>{% endif %}
+        {% if v.status == 'pending' or v.status == 'approved' %}
+          <form method="post" action="{% url 'interactions:visit_cancel' v.pk %}" data-confirm="Cancel this visit?">{% csrf_token %}<button class="btn btn-sm btn-outline-danger">Cancel</button></form>
+        {% endif %}
+      </div>
+    </div>
+  {% empty %}
+    {% url 'properties:browse' as browse_url %}
+    {% include 'partials/empty.html' with icon='bi-calendar-heart' title='No visits booked' text='Open any listing and pick a date and time slot.' link=browse_url link_label='Find a home' %}
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load ghorify_tags %}
+{% block title %}Bills · {{ property.title }}{% endblock %}
+{% block content %}
+<div class="container">
+  {% include 'properties/_manage_header.html' with tab='bills' %}
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="gh-card overflow-hidden">
+        <table class="gh-table">
+          <thead><tr><th>Bill</th><th>Amount</th><th>Per month</th><th></th></tr></thead>
+          <tbody>
+            <tr><td class="fw-semibold">Rent</td><td>{{ property.price|taka }}</td><td>{{ property.price|taka }}</td><td></td></tr>
+            <tr><td class="fw-semibold">Service charge</td><td>{{ property.service_charge|taka }}</td><td>{{ property.service_charge|taka }}</td><td></td></tr>
+            {% for u in utilities %}
+            <tr>
+              <td><span class="fw-semibold">{{ u.get_name_display }}</span>{% if u.note %}<div class="small text-muted">{{ u.note }}</div>{% endif %}</td>
+              <td>{{ u.amount|taka }} <span class="small text-muted">/ {{ u.get_billing_period_display|lower }}</span></td>
+              <td>{% if u.included_in_rent %}<span class="status status-approved">In rent</span>{% else %}{{ u.monthly_amount|taka }}{% endif %}</td>
+              <td class="text-end text-nowrap">
+                <a href="{% url 'properties:utility_update' property.pk u.pk %}" class="btn btn-sm btn-soft"><i class="bi bi-pencil"></i></a>
+                <form method="post" action="{% url 'properties:utility_delete' property.pk u.pk %}" class="d-inline" data-confirm="Remove this bill?">{% csrf_token %}<button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot><tr><td colspan="2" class="fw-bold" style="background:var(--gh-soft)">Estimated total tenants will see</td><td colspan="2" class="fw-bold fs-5" style="background:var(--gh-soft);color:var(--gh-dark)">{{ property.monthly_cost|taka }}</td></tr></tfoot>
+        </table>
+      </div>
+      {% if not utilities %}<p class="text-muted small mt-3"><i class="bi bi-lightbulb"></i> Tip: listings that show realistic bills build more trust with tenants.</p>{% endif %}
+    </div>
+    <div class="col-lg-4">
+      <div class="gh-card gh-card-body">
+        <div class="gh-card-title"><i class="bi bi-plus-circle"></i> Add a bill</div>
+        <form method="post">{% csrf_token %}
+          {% include 'partials/field.html' with field=form.name %}
+          <div class="row g-2">
+            <div class="col-7">{% include 'partials/field.html' with field=form.amount %}</div>
+            <div class="col-5">{% include 'partials/field.html' with field=form.billing_period %}</div>
+          </div>
+          {% include 'partials/field.html' with field=form.included_in_rent %}
+          {% include 'partials/field.html' with field=form.note %}
+          <button class="btn btn-primary w-100">Add</button>
+        </form>
+        <a href="{{ property.get_absolute_url }}" class="btn btn-soft w-100 mt-2">Done, view listing</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load ghorify_tags %}
+{% block title %}{% if is_edit %}Edit listing{% else %}New listing{% endif %}{% endblock %}
+{% block content %}
+<div class="container" style="max-width:980px">
+  <div class="page-header">
+    <span class="eyebrow">{% if is_edit %}Edit listing{% else %}New listing{% endif %}</span>
+    <h1>{% if is_edit %}{{ property.title }}{% else %}Tell tenants about your property{% endif %}</h1>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="gh-card gh-card-body p-4 p-md-5" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger rounded-3">{{ form.non_field_errors }}</div>{% endif %}
+
+    <div class="form-section">
+      <div class="form-section-title"><span class="n">1</span>Basics</div>
+      {% include 'partials/field.html' with field=form.title %}
+      <div class="row g-3">
+        <div class="col-md-4">{% include 'partials/field.html' with field=form.category %}</div>
+        <div class="col-md-4">{% include 'partials/field.html' with field=form.property_type %}</div>
+        <div class="col-md-4">{% include 'partials/field.html' with field=form.tenant_gender %}</div>
+      </div>
+      {% include 'partials/field.html' with field=form.description %}
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title"><span class="n">2</span>Location</div>
+      <div class="row g-3">
+        <div class="col-md-4">{% include 'partials/field.html' with field=form.division %}</div>
+        <div class="col-md-4">{% include 'partials/field.html' with field=form.city %}</div>
+        <div class="col-md-4">{% include 'partials/field.html' with field=form.location %}</div>
+      </div>
+      {% include 'partials/field.html' with field=form.address %}
+      {% area_datalist %}
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title"><span class="n">3</span>Rent &amp; charges</div>
+      <div class="row g-3">
+        <div class="col-md-4">{% include 'partials/field.html' with field=form.price %}</div>
+        <div class="col-md-4">{% include 'partials/field.html' with field=form.service_charge %}</div>
+        <div class="col-md-4">{% include 'partials/field.html' with field=form.advance_months %}</div>
+      </div>
+      {% include 'partials/field.html' with field=form.is_negotiable %}
+      <p class="small text-muted mb-0"><i class="bi bi-info-circle"></i> You can add electricity, gas, water and other bills on the next step. Tenants see the full monthly estimate.</p>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title"><span class="n">4</span>Space &amp; features</div>
+      <div class="row g-3">
+        <div class="col-6 col-md">{% include 'partials/field.html' with field=form.bedrooms %}</div>
+        <div class="col-6 col-md">{% include 'partials/field.html' with field=form.bathrooms %}</div>
+        <div class="col-6 col-md">{% include 'partials/field.html' with field=form.balconies %}</div>
+        <div class="col-6 col-md">{% include 'partials/field.html' with field=form.floor %}</div>
+        <div class="col-12 col-md">{% include 'partials/field.html' with field=form.size %}</div>
+      </div>
+      <div class="d-flex flex-wrap gap-4 mb-3">
+        {% include 'partials/field.html' with field=form.furnished wrapper='' %}
+        {% include 'partials/field.html' with field=form.parking wrapper='' %}
+        {% include 'partials/field.html' with field=form.pet_friendly wrapper='' %}
+      </div>
+      {% include 'partials/field.html' with field=form.amenities %}
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title"><span class="n">5</span>Rules &amp; availability</div>
+      {% include 'partials/field.html' with field=form.house_rules %}
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4">{% include 'partials/field.html' with field=form.gate_closing_time %}</div>
+        <div class="col-md-4">{% include 'partials/field.html' with field=form.available_from %}</div>
+        <div class="col-md-4">{% include 'partials/field.html' with field=form.is_available %}</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title"><span class="n">6</span>Photos</div>
+      {% if is_edit %}<p class="small text-muted">This property has {{ property.images.count }} photo{{ property.images.count|pluralize }}. New uploads are added to them. <a href="{% url 'properties:images' property.pk %}">Manage photos</a></p>{% endif %}
+      <label class="form-label" for="{{ form.photos.id_for_label }}">Upload photos</label>
+      <input type="file" name="photos" id="{{ form.photos.id_for_label }}" class="form-control" accept="image/*" multiple data-preview="#photoPreview">
+      <div class="form-text">{{ form.photos.help_text }} The first photo becomes the cover.</div>
+      {{ form.photos.errors }}
+      <div id="photoPreview" class="mt-3"></div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center pt-2">
+      <a href="{% if is_edit %}{{ property.get_absolute_url }}{% else %}{% url 'properties:mine' %}{% endif %}" class="btn btn-soft">Cancel</a>
+      <button class="btn btn-primary btn-lg">{% if is_edit %}Save changes{% else %}Create listing{% endif %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

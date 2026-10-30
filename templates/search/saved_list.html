@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Saved searches{% endblock %}
+{% block content %}
+<div class="container" style="max-width:1000px">
+  <div class="page-header d-flex flex-wrap justify-content-between align-items-end gap-3">
+    <div><span class="eyebrow">Tenant</span><h1>Saved searches</h1><p class="text-muted mb-0">Re-run them anytime. New listings are scored automatically.</p></div>
+    <a href="{% url 'search:saved_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>New saved search</a>
+  </div>
+
+  {% if rows %}
+  <div class="d-grid gap-3">
+    {% for row in rows %}{% with c=row.criteria %}
+    <div class="gh-card gh-card-body d-flex flex-wrap align-items-center gap-3">
+      <div class="stat-card p-0 border-0 shadow-none" style="background:none"><div class="ic"><i class="bi bi-bookmark-star"></i></div></div>
+      <div class="flex-grow-1">
+        <h5 class="mb-1">{{ c.name }}</h5>
+        <div class="small text-muted">{{ c.summary }}</div>
+        <div class="small mt-1">
+          {% if c.needs_parking %}<span class="reason yes">Parking</span>{% endif %}
+          {% if c.needs_pet_friendly %}<span class="reason yes">Pets</span>{% endif %}
+          {% if c.needs_furnished %}<span class="reason yes">Furnished</span>{% endif %}
+          {% for a in c.amenities.all %}<span class="reason yes">{{ a.name }}</span>{% endfor %}
+        </div>
+      </div>
+      <div class="text-center px-3">
+        <div class="display-font fs-3 fw-bold">{{ row.match_count }}</div>
+        <div class="small text-muted">good matches</div>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="{% url 'search:saved_run' c.pk %}" class="btn btn-primary btn-sm"><i class="bi bi-play-fill"></i> Run</a>
+        <a href="{% url 'search:saved_update' c.pk %}" class="btn btn-soft btn-sm"><i class="bi bi-pencil"></i></a>
+        <form method="post" action="{% url 'search:saved_delete' c.pk %}" data-confirm="Delete this saved search?">{% csrf_token %}<button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button></form>
+      </div>
+    </div>
+    {% endwith %}{% endfor %}
+  </div>
+  {% else %}
+    {% url 'search:saved_create' as new_url %}
+    {% include 'partials/empty.html' with icon='bi-bookmark' title='No saved searches' text='Save your preferences once and get ranked results with one click.' link=new_url link_label='Create one' %}
+  {% endif %}
+</div>
+{% endblock %}

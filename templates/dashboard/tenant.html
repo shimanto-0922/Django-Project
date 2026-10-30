@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load ghorify_tags %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <span class="eyebrow">Tenant dashboard</span>
+    <h1>Hi {{ user.first_name|default:user.username }}, ready to find home?</h1>
+  </div>
+
+  <div class="row g-3 mb-5">
+    <div class="col-6 col-lg-3"><a href="{% url 'interactions:favourites' %}" class="stat-card text-reset"><div class="ic"><i class="bi bi-heart"></i></div><div><div class="num">{{ stats.favourites }}</div><div class="lbl">Favourites</div></div></a></div>
+    <div class="col-6 col-lg-3"><a href="{% url 'interactions:visits' %}" class="stat-card text-reset"><div class="ic"><i class="bi bi-calendar-check"></i></div><div><div class="num">{{ stats.visits }}</div><div class="lbl">Active visits</div></div></a></div>
+    <div class="col-6 col-lg-3"><a href="{% url 'interactions:rentals' %}" class="stat-card text-reset"><div class="ic"><i class="bi bi-hourglass-split"></i></div><div><div class="num">{{ stats.rentals }}</div><div class="lbl">Pending applications</div></div></a></div>
+    <div class="col-6 col-lg-3"><a href="{% url 'search:saved' %}" class="stat-card text-reset"><div class="ic"><i class="bi bi-bookmark-star"></i></div><div><div class="num">{{ stats.saved }}</div><div class="lbl">Saved searches</div></div></a></div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="d-flex justify-content-between align-items-end mb-3">
+        <div><h4 class="mb-0">Recommended for you</h4>{% if recommendation_source %}<div class="small text-muted">Based on {{ recommendation_source }}</div>{% endif %}</div>
+        <a href="{% url 'search:search' %}" class="small fw-bold">Open smart match <i class="bi bi-arrow-right"></i></a>
+      </div>
+      {% if recommendations %}
+        <div class="row g-3">{% for match in recommendations %}{% with p=match.property %}<div class="col-md-6 col-xl-4">{% include 'partials/property_card.html' %}</div>{% endwith %}{% endfor %}</div>
+      {% else %}
+        <div class="gh-card">
+          {% url 'accounts:profile' as profile_url %}
+          {% include 'partials/empty.html' with icon='bi-stars' title='Tell us what you like' text='Add a preferred area and budget to your profile, or save a search, to get personal recommendations.' link=profile_url link_label='Update preferences' %}
+        </div>
+      {% endif %}
+    </div>
+    <div class="col-lg-4">
+      <div class="gh-card gh-card-body mb-4">
+        <div class="gh-card-title"><i class="bi bi-calendar-event"></i> Upcoming visits</div>
+        {% for v in upcoming_visits %}
+          <div class="d-flex gap-3 align-items-center {% if not forloop.last %}mb-3{% endif %}">
+            <div class="date-tile"><div class="d">{{ v.preferred_date|date:'d' }}</div><div class="m">{{ v.preferred_date|date:'M' }}</div></div>
+            <div><a href="{{ v.property.get_absolute_url }}" class="fw-semibold text-reset small">{{ v.property.title }}</a><div class="small text-muted">{{ v.get_time_slot_display }}</div></div>
+          </div>
+        {% empty %}<p class="small text-muted mb-0">No confirmed visits yet.</p>{% endfor %}
+      </div>
+      <div class="gh-card gh-card-body">
+        <div class="gh-card-title"><i class="bi bi-file-earmark-text"></i> Recent applications</div>
+        {% for r in recent_rentals %}
+          <div class="d-flex justify-content-between align-items-center gap-2 {% if not forloop.last %}mb-3{% endif %}">
+            <a href="{{ r.property.get_absolute_url }}" class="small fw-semibold text-reset text-truncate">{{ r.property.title }}</a>
+            <span class="status status-{{ r.status }}">{{ r.get_status_display }}</span>
+          </div>
+        {% empty %}<p class="small text-muted mb-0">You have not applied anywhere yet.</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

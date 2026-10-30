@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Favourites{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header"><span class="eyebrow">Tenant</span><h1>Your favourites</h1><p class="text-muted mb-0">{{ favourites|length }} saved home{{ favourites|length|pluralize }}</p></div>
+  {% if favourites %}
+    <div class="row g-4">
+      {% for fav in favourites %}{% with p=fav.property %}
+        <div class="col-md-6 col-lg-4">
+          {% include 'partials/property_card.html' %}
+          <div class="d-flex gap-2 mt-2">
+            <form method="post" action="{% url 'interactions:comparison_add' p.pk %}" class="flex-grow-1">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}"><button class="btn btn-sm btn-soft w-100"><i class="bi bi-plus-square me-1"></i>Compare</button></form>
+            <form method="post" action="{% url 'interactions:favourite_toggle' p.pk %}" class="flex-grow-1">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}"><button class="btn btn-sm btn-outline-danger w-100"><i class="bi bi-heartbreak me-1"></i>Remove</button></form>
+          </div>
+        </div>
+      {% endwith %}{% endfor %}
+    </div>
+  {% else %}
+    {% url 'properties:browse' as browse_url %}
+    {% include 'partials/empty.html' with icon='bi-heart' title='No favourites yet' text='Tap the heart on any listing to keep it here.' link=browse_url link_label='Browse homes' %}
+  {% endif %}
+</div>
+{% endblock %}

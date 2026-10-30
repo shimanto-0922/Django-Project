@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}My profile{% endblock %}
+{% block content %}
+<div class="container" style="max-width:1000px">
+  <div class="page-header"><span class="eyebrow">Account</span><h1>My profile</h1></div>
+  <form method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="gh-card gh-card-body text-center">
+          {% if user.avatar %}<img src="{{ user.avatar.url }}" class="avatar avatar-lg mb-3" alt="">{% else %}<span class="avatar avatar-lg mb-3">{{ user.initials }}</span>{% endif %}
+          <h5 class="mb-0">{{ user.display_name }}</h5>
+          <div class="text-muted small mb-3">@{{ user.username }} · {{ user.get_role_display }}</div>
+          {% if user.is_landlord %}
+            {% with lp=user.landlord_profile %}
+            <span class="status status-{{ lp.status }}">{{ lp.get_status_display }}</span>
+            {% if lp.status == 'rejected' and lp.review_note %}<p class="small text-danger mt-2 mb-0">{{ lp.review_note }}</p>{% endif %}
+            {% endwith %}
+          {% endif %}
+          <hr>
+          <div class="text-start">
+            <label class="form-label" for="id_avatar">Profile photo</label>
+            <input type="file" name="avatar" id="id_avatar" class="form-control form-control-sm" accept="image/*">
+            {{ user_form.avatar.errors }}
+            {% if user.avatar %}<div class="form-check mt-2"><input type="checkbox" name="avatar-clear" id="avatar-clear" class="form-check-input"><label for="avatar-clear" class="form-check-label small">Remove photo</label></div>{% endif %}
+          </div>
+          <a href="{% url 'accounts:password_change' %}" class="btn btn-soft btn-sm w-100 mt-3"><i class="bi bi-key me-1"></i>Change password</a>
+        </div>
+      </div>
+      <div class="col-lg-8">
+        <div class="gh-card gh-card-body p-4">
+          <div class="form-section">
+            <div class="form-section-title">Personal details</div>
+            <div class="row g-3">
+              <div class="col-md-6">{% include 'partials/field.html' with field=user_form.first_name %}</div>
+              <div class="col-md-6">{% include 'partials/field.html' with field=user_form.last_name %}</div>
+              <div class="col-md-6">{% include 'partials/field.html' with field=user_form.email %}</div>
+              <div class="col-md-6">{% include 'partials/field.html' with field=user_form.phone %}</div>
+            </div>
+            {% include 'partials/field.html' with field=user_form.bio %}
+          </div>
+
+          {% if role_form %}
+          <div class="form-section">
+            {% if user.is_tenant %}
+              <div class="form-section-title">What you are looking for</div>
+              <p class="small text-muted">Used to recommend homes on your dashboard.</p>
+              <div class="row g-3">
+                <div class="col-md-6">{% include 'partials/field.html' with field=role_form.preferred_location %}</div>
+                <div class="col-md-6">{% include 'partials/field.html' with field=role_form.monthly_budget %}</div>
+                <div class="col-md-6">{% include 'partials/field.html' with field=role_form.occupation %}</div>
+                <div class="col-md-6">{% include 'partials/field.html' with field=role_form.family_size %}</div>
+              </div>
+            {% else %}
+              <div class="form-section-title">Landlord verification</div>
+              <p class="small text-muted">An admin checks these documents before your listings can go live. Documents are never shown to tenants.</p>
+              {% include 'partials/field.html' with field=role_form.nid_number %}
+              <label class="form-label" for="id_verification_docs">Verification document</label>
+              {% if user.landlord_profile.verification_docs %}<div class="small mb-2"><i class="bi bi-file-earmark-check text-success"></i> <a href="{{ user.landlord_profile.verification_docs.url }}" target="_blank">Current file</a></div>{% endif %}
+              <input type="file" name="verification_docs" id="id_verification_docs" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+              <div class="form-text">{{ role_form.verification_docs.help_text }}</div>
+              {{ role_form.verification_docs.errors }}
+            {% endif %}
+          </div>
+          {% endif %}
+          <div class="text-end"><button class="btn btn-primary btn-lg">Save profile</button></div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

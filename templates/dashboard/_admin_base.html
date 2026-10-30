@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+{% with url=request.resolver_match.url_name %}
+<div class="container">
+  <div class="row g-4 pt-4">
+    <aside class="col-lg-3">
+      <div class="gh-card gh-card-body sticky-side">
+        <div class="small text-uppercase fw-bold text-muted mb-2" style="letter-spacing:.1em">Admin panel</div>
+        <div class="list-group side-nav">
+          <a href="{% url 'dashboard:home' %}" class="list-group-item {% if url == 'home' or url == 'admin' %}active{% endif %}"><i class="bi bi-speedometer2"></i>Overview</a>
+          <a href="{% url 'dashboard:moderation' %}" class="list-group-item {% if url == 'moderation' %}active{% endif %}"><i class="bi bi-house-check"></i>Listings</a>
+          <a href="{% url 'dashboard:landlords' %}" class="list-group-item {% if url == 'landlords' %}active{% endif %}"><i class="bi bi-patch-check"></i>Landlords</a>
+          <a href="{% url 'dashboard:reports' %}" class="list-group-item {% if url == 'reports' %}active{% endif %}"><i class="bi bi-flag"></i>Reports</a>
+          <a href="{% url 'dashboard:users' %}" class="list-group-item {% if url == 'users' %}active{% endif %}"><i class="bi bi-people"></i>Users</a>
+          {% if user.is_staff %}<a href="{% url 'admin:index' %}" class="list-group-item"><i class="bi bi-gear"></i>Django admin</a>{% endif %}
+        </div>
+      </div>
+    </aside>
+    <section class="col-lg-9">{% block admin_content %}{% endblock %}</section>
+  </div>
+</div>
+{% endwith %}
+{% endblock %}

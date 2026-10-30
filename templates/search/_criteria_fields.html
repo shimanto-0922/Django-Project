@@ -1,0 +1,27 @@
+{% load ghorify_tags %}
+{% include 'partials/field.html' with field=form.location %}
+{% area_datalist %}
+{% include 'partials/field.html' with field=form.keyword %}
+<label class="form-label">Monthly budget (BDT)</label>
+<div class="row g-2 mb-2">
+  <div class="col-6">{{ form.min_price|bs }}</div>
+  <div class="col-6">{{ form.max_price|bs }}</div>
+</div>
+{{ form.max_price.errors }}
+{% include 'partials/field.html' with field=form.budget_includes_bills %}
+<div class="row g-2">
+  <div class="col-6">{% include 'partials/field.html' with field=form.category %}</div>
+  <div class="col-6">{% include 'partials/field.html' with field=form.property_type %}</div>
+  <div class="col-6">{% include 'partials/field.html' with field=form.min_bedrooms %}</div>
+  <div class="col-6">{% include 'partials/field.html' with field=form.min_bathrooms %}</div>
+</div>
+{% include 'partials/field.html' with field=form.tenant_gender %}
+<div class="mb-3">
+  {% include 'partials/field.html' with field=form.needs_parking wrapper='mb-1' %}
+  {% include 'partials/field.html' with field=form.needs_pet_friendly wrapper='mb-1' %}
+  {% include 'partials/field.html' with field=form.needs_furnished wrapper='mb-1' %}
+</div>
+<details class="mb-3" {% if form.amenities.value %}open{% endif %}>
+  <summary class="fw-semibold small mb-2" style="cursor:pointer">Must-have amenities</summary>
+  {% include 'partials/field.html' with field=form.amenities %}
+</details>

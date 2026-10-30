@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load ghorify_tags %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="container" style="max-width:720px">
+  <div class="page-header">
+    <a href="{{ property.get_absolute_url }}" class="small text-muted"><i class="bi bi-arrow-left"></i> {{ property.title }}</a>
+    <h1 class="mt-2">{{ title }}</h1>
+    {% if subtitle %}<p class="text-muted mb-0">{{ subtitle }}</p>{% endif %}
+  </div>
+  <div class="gh-card gh-card-body p-4">
+    <div class="d-flex align-items-center gap-3 pb-3 mb-4 border-bottom">
+      {% with img=property.primary_image %}{% if img %}<img src="{{ img.image.url }}" class="mini-thumb" alt="">{% else %}<span class="mini-thumb"><i class="bi bi-house"></i></span>{% endif %}{% endwith %}
+      <div><div class="fw-bold">{{ property.title }}</div><div class="small text-muted">{{ property.location }} · {{ property.price|taka }}/month</div></div>
+    </div>
+    <form method="post" novalidate>{% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert alert-danger rounded-3">{{ form.non_field_errors|join:' ' }}</div>{% endif %}
+      {% for field in form %}
+        {% if field.name == 'rating' or field.name == 'landlord_rating' %}
+          {% include 'partials/star_input.html' with field=field label=field.label %}
+        {% else %}
+          {% include 'partials/field.html' with field=field %}
+        {% endif %}
+      {% endfor %}
+      <div class="d-flex gap-2 justify-content-end">
+        <a href="{{ property.get_absolute_url }}" class="btn btn-soft">Cancel</a>
+        <button class="btn btn-primary">{{ submit_label }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

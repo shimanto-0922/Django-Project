@@ -1,0 +1,6 @@
+<div class="empty-state">
+  <div class="ic"><i class="bi {{ icon|default:'bi-house' }}"></i></div>
+  <h4 class="mb-2">{{ title }}</h4>
+  <p class="text-muted mb-4">{{ text }}</p>
+  {% if link %}<a href="{{ link }}" class="btn btn-primary">{{ link_label }}</a>{% endif %}
+</div>

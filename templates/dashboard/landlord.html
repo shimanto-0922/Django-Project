@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load ghorify_tags humanize %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header d-flex flex-wrap justify-content-between align-items-end gap-3">
+    <div><span class="eyebrow">Landlord dashboard</span><h1>Welcome, {{ user.first_name|default:user.username }}</h1></div>
+    <a href="{% url 'properties:create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Add a property</a>
+  </div>
+
+  {% if not profile.is_verified %}
+  <div class="gh-card gh-card-body mb-4 d-flex flex-wrap gap-3 align-items-center" style="background:#fff8ec;border-color:#f4e1bd">
+    <i class="bi bi-shield-exclamation fs-2" style="color:var(--gh-amber)"></i>
+    <div class="flex-grow-1">
+      <div class="fw-bold">Verification: {{ profile.get_status_display }}</div>
+      <div class="small text-muted">{% if profile.status == 'pending' %}An admin is checking your documents. Your listings go live once you are verified.{% elif profile.status == 'rejected' %}{{ profile.review_note|default:'Please upload a clearer document.' }}{% else %}Upload your NID or ownership papers so your listings can be published.{% endif %}</div>
+    </div>
+    {% if profile.status != 'pending' %}<a href="{% url 'accounts:profile' %}" class="btn btn-dark btn-sm">Upload documents</a>{% endif %}
+  </div>
+  {% endif %}
+
+  <div class="row g-3 mb-5">
+    <div class="col-6 col-lg-3"><a href="{% url 'properties:mine' %}" class="stat-card text-reset"><div class="ic"><i class="bi bi-houses"></i></div><div><div class="num">{{ stats.listings }}</div><div class="lbl">Total listings</div></div></a></div>
+    <div class="col-6 col-lg-3"><a href="{% url 'properties:mine' %}?status=approved" class="stat-card text-reset"><div class="ic"><i class="bi bi-broadcast"></i></div><div><div class="num">{{ stats.published }}</div><div class="lbl">Published</div></div></a></div>
+    <div class="col-6 col-lg-3"><div class="stat-card"><div class="ic"><i class="bi bi-eye"></i></div><div><div class="num">{{ stats.views|intcomma }}</div><div class="lbl">Total views</div></div></div></div>
+    <div class="col-6 col-lg-3"><a href="{% url 'interactions:incoming' %}" class="stat-card text-reset"><div class="ic"><i class="bi bi-bell"></i></div><div><div class="num">{{ stats.requests }}</div><div class="lbl">Waiting for you</div></div></a></div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="gh-card overflow-hidden">
+        <div class="gh-card-body pb-0"><div class="gh-card-title"><i class="bi bi-graph-up"></i> Listing performance</div></div>
+        {% if top_properties %}
+        <table class="gh-table">
+          <thead><tr><th>Property</th><th>Status</th><th>Views</th><th>Saved</th></tr></thead>
+          <tbody>{% for p in top_properties %}
+            <tr>
+              <td><a href="{{ p.get_absolute_url }}" class="fw-semibold text-reset">{{ p.title|truncatechars:38 }}</a><div class="small text-muted">{{ p.price|taka }}</div></td>
+              <td><span class="status status-{{ p.status }}">{{ p.get_status_display }}</span></td>
+              <td>{{ p.view_count|intcomma }}</td>
+              <td><i class="bi bi-heart-fill" style="color:var(--gh-primary)"></i> {{ p.fav_count }}</td>
+            </tr>{% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          {% url 'properties:create' as new_url %}
+          {% include 'partials/empty.html' with icon='bi-house-add' title='No listings yet' text='Add your first property to start getting tenants.' link=new_url link_label='Add property' %}
+        {% endif %}
+      </div>
+      {% if needs_attention %}
+      <div class="gh-card gh-card-body mt-4" style="border-color:#f2c9c9">
+        <div class="gh-card-title"><i class="bi bi-exclamation-octagon text-danger"></i> Needs your attention</div>
+        {% for p in needs_attention %}
+          <div class="d-flex justify-content-between align-items-center gap-2 {% if not forloop.last %}mb-2{% endif %}">
+            <div><div class="fw-semibold small">{{ p.title }}</div><div class="small text-danger">{{ p.moderation_note }}</div></div>
+            <a href="{% url 'properties:update' p.pk %}" class="btn btn-sm btn-soft">Fix</a>
+          </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    <div class="col-lg-5">
+      <div class="gh-card gh-card-body mb-4">
+        <div class="gh-card-title justify-content-between"><span><i class="bi bi-calendar-check"></i> Visit requests</span><a href="{% url 'interactions:incoming' %}?tab=visits" class="small fw-bold">All</a></div>
+        {% for v in pending_visits %}
+          <div class="d-flex gap-3 align-items-center {% if not forloop.last %}mb-3{% endif %}">
+            <div class="date-tile"><div class="d">{{ v.preferred_date|date:'d' }}</div><div class="m">{{ v.preferred_date|date:'M' }}</div></div>
+            <div class="small"><div class="fw-semibold">{{ v.tenant.display_name }}</div><div class="text-muted">{{ v.property.title|truncatechars:30 }} · {{ v.get_time_slot_display|truncatewords:1 }}</div></div>
+          </div>
+        {% empty %}<p class="small text-muted mb-0">No pending visits.</p>{% endfor %}
+      </div>
+      <div class="gh-card gh-card-body">
+        <div class="gh-card-title justify-content-between"><span><i class="bi bi-file-earmark-text"></i> Rental applications</span><a href="{% url 'interactions:incoming' %}?tab=rentals" class="small fw-bold">All</a></div>
+        {% for r in pending_rentals %}
+          <div class="d-flex gap-3 align-items-center {% if not forloop.last %}mb-3{% endif %}">
+            <span class="avatar">{{ r.tenant.initials }}</span>
+            <div class="small"><div class="fw-semibold">{{ r.tenant.display_name }}</div><div class="text-muted">{{ r.property.title|truncatechars:30 }} · from {{ r.move_in_date|date:'d M' }}</div></div>
+          </div>
+        {% empty %}<p class="small text-muted mb-0">No pending applications.</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

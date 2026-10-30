@@ -1,0 +1,50 @@
+<footer class="gh-footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <a class="gh-brand mb-3" href="{% url 'properties:home' %}"><span class="logo"><i class="bi bi-house-door-fill"></i></span><span>Ghor<span class="accent">ify</span></span></a>
+        <p class="mb-3">Flats, rooms, sublets, hostel seats, offices and shops for rent across Bangladesh. Verified landlords, clear monthly costs, easy visit booking.</p>
+        <div class="d-flex gap-2">
+          <span class="btn btn-icon btn-sm" style="background:rgba(255,255,255,.08);color:#fff"><i class="bi bi-facebook"></i></span>
+          <span class="btn btn-icon btn-sm" style="background:rgba(255,255,255,.08);color:#fff"><i class="bi bi-instagram"></i></span>
+          <span class="btn btn-icon btn-sm" style="background:rgba(255,255,255,.08);color:#fff"><i class="bi bi-youtube"></i></span>
+        </div>
+      </div>
+      <div class="col-6 col-lg-2 offset-lg-1">
+        <h6 class="mb-3">Rent by type</h6>
+        <ul class="list-unstyled d-grid gap-2">
+          <li><a href="{% url 'properties:browse' %}?category=family">Family flats</a></li>
+          <li><a href="{% url 'properties:browse' %}?category=bachelor">Bachelor</a></li>
+          <li><a href="{% url 'properties:browse' %}?category=sublet">Sublet</a></li>
+          <li><a href="{% url 'properties:browse' %}?category=hostel">Hostel / Mess</a></li>
+          <li><a href="{% url 'properties:browse' %}?category=office">Office</a></li>
+          <li><a href="{% url 'properties:browse' %}?category=shop">Shop</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h6 class="mb-3">Divisions</h6>
+        <ul class="list-unstyled d-grid gap-2">
+          <li><a href="{% url 'properties:browse' %}?division=dhaka">Dhaka</a></li>
+          <li><a href="{% url 'properties:browse' %}?division=chattogram">Chattogram</a></li>
+          <li><a href="{% url 'properties:browse' %}?division=sylhet">Sylhet</a></li>
+          <li><a href="{% url 'properties:browse' %}?division=khulna">Khulna</a></li>
+          <li><a href="{% url 'properties:browse' %}?division=rajshahi">Rajshahi</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-3">
+        <h6 class="mb-3">For landlords</h6>
+        <ul class="list-unstyled d-grid gap-2">
+          <li><a href="{% url 'accounts:register' %}">Post a property</a></li>
+          <li><a href="{% url 'dashboard:home' %}">Landlord dashboard</a></li>
+          <li><i class="bi bi-patch-check me-1"></i>Get verified with your NID</li>
+          <li><i class="bi bi-flag me-1"></i>Misleading ads are removed</li>
+        </ul>
+      </div>
+    </div>
+    <hr class="my-4" style="border-color:rgba(255,255,255,.12)">
+    <div class="d-flex flex-wrap justify-content-between small gap-2">
+      <span>&copy; {% now "Y" %} Ghorify · CSE 302 Project, University of Asia Pacific</span>
+      <span>Photos: Unsplash</span>
+    </div>
+  </div>
+</footer>

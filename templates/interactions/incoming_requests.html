@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load ghorify_tags %}
+{% block title %}Requests{% endblock %}
+{% block content %}
+<div class="container" style="max-width:1050px">
+  <div class="page-header"><span class="eyebrow">Landlord</span><h1>Incoming requests</h1></div>
+
+  <div class="d-flex flex-wrap justify-content-between gap-3 mb-4">
+    <ul class="nav nav-pills-gh gap-1">
+      <li><a class="nav-link {% if tab == 'visits' %}active{% endif %}" href="?tab=visits&status={{ status }}"><i class="bi bi-calendar-check me-1"></i>Visits {% if pending_counts.visits %}<span class="nav-badge">{{ pending_counts.visits }}</span>{% endif %}</a></li>
+      <li><a class="nav-link {% if tab == 'rentals' %}active{% endif %}" href="?tab=rentals&status={{ status }}"><i class="bi bi-file-earmark-text me-1"></i>Rental applications {% if pending_counts.rentals %}<span class="nav-badge">{{ pending_counts.rentals }}</span>{% endif %}</a></li>
+    </ul>
+    <div class="btn-group">
+      {% for key, label in status_choices %}<a href="?tab={{ tab }}&status={{ key }}" class="btn btn-sm {% if status == key %}btn-dark{% else %}btn-soft{% endif %}">{{ label }}</a>{% endfor %}
+    </div>
+  </div>
+
+  {% if tab == 'visits' %}
+    {% for v in visits %}
+    <div class="request-card">
+      <div class="d-flex flex-wrap gap-3 align-items-center">
+        <div class="date-tile"><div class="d">{{ v.preferred_date|date:'d' }}</div><div class="m">{{ v.preferred_date|date:'M' }}</div></div>
+        <div class="flex-grow-1">
+          <div class="fw-bold">{{ v.tenant.display_name }} <span class="fw-normal text-muted small">wants to visit</span> <a href="{{ v.property.get_absolute_url }}">{{ v.property.title }}</a></div>
+          <div class="small text-muted">{{ v.preferred_date|date:'l' }} · {{ v.get_time_slot_display }} · {{ v.tenant.tenant_profile.get_occupation_display }}, family of {{ v.tenant.tenant_profile.family_size }}</div>
+          {% if v.message %}<div class="small mt-1"><i class="bi bi-chat-left-text"></i> "{{ v.message }}"</div>{% endif %}
+        </div>
+        <span class="status status-{{ v.status }}">{{ v.get_status_display }}</span>
+      </div>
+      {% if v.is_pending %}
+        <form method="post" action="{% url 'interactions:respond_visit' v.pk %}" class="d-flex flex-wrap gap-2 mt-3">{% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <input name="note" class="form-control form-control-sm flex-grow-1" style="max-width:420px" placeholder="Optional note, e.g. ask for the caretaker Rahim">
+          <button name="decision" value="approve" class="btn btn-sm btn-primary"><i class="bi bi-check-lg me-1"></i>Approve</button>
+          <button name="decision" value="reject" class="btn btn-sm btn-outline-danger">Reject</button>
+        </form>
+      {% elif v.landlord_note %}<div class="small text-muted mt-2">Your note: {{ v.landlord_note }}</div>{% endif %}
+    </div>
+    {% empty %}
+      {% include 'partials/empty.html' with icon='bi-calendar' title='No visit requests here' text='When tenants book a visit it shows up here.' %}
+    {% endfor %}
+  {% else %}
+    {% for r in rentals %}
+    <div class="request-card">
+      <div class="d-flex flex-wrap gap-3 align-items-center">
+        <span class="avatar" style="width:52px;height:52px">{{ r.tenant.initials }}</span>
+        <div class="flex-grow-1">
+          <div class="fw-bold">{{ r.tenant.display_name }} <span class="fw-normal text-muted small">applied for</span> <a href="{{ r.property.get_absolute_url }}">{{ r.property.title }}</a></div>
+          <div class="small text-muted">Move-in {{ r.move_in_date|date:'d M Y' }} · {{ r.duration_months }} months · {{ r.occupants }} occupant{{ r.occupants|pluralize }} · {{ r.tenant.tenant_profile.get_occupation_display }}</div>
+          {% if r.message %}<div class="small mt-1"><i class="bi bi-chat-left-text"></i> "{{ r.message }}"</div>{% endif %}
+        </div>
+        <span class="status status-{{ r.status }}">{{ r.get_status_display }}</span>
+      </div>
+      {% if r.is_pending %}
+        <form method="post" action="{% url 'interactions:respond_rental' r.pk %}" class="d-flex flex-wrap gap-2 mt-3">{% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <input name="note" class="form-control form-control-sm flex-grow-1" style="max-width:420px" placeholder="Optional note for the tenant">
+          <button name="decision" value="approve" class="btn btn-sm btn-primary" onclick="return confirm('Approving will mark the property as rented and close other pending applications. Continue?')"><i class="bi bi-key me-1"></i>Approve &amp; rent out</button>
+          <button name="decision" value="reject" class="btn btn-sm btn-outline-danger">Reject</button>
+        </form>
+      {% elif r.landlord_note %}<div class="small text-muted mt-2">Note: {{ r.landlord_note }}</div>{% endif %}
+    </div>
+    {% empty %}
+      {% include 'partials/empty.html' with icon='bi-file-earmark' title='No rental applications here' text='Applications from interested tenants appear here.' %}
+    {% endfor %}
+  {% endif %}
+</div>
+{% endblock %}

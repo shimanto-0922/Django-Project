@@ -1,0 +1,316 @@
+{% extends 'base.html' %}
+{% load ghorify_tags humanize %}
+{% block title %}{{ property.title }}{% endblock %}
+{% block content %}
+<div class="container pt-4">
+
+  {% if not property.is_published %}
+  <div class="alert {% if property.status == 'rejected' %}alert-danger{% else %}alert-warning{% endif %} rounded-3 d-flex gap-3 align-items-center">
+    <i class="bi {% if property.status == 'rejected' %}bi-x-octagon{% else %}bi-hourglass-split{% endif %} fs-4"></i>
+    <div>
+      <strong>{{ property.get_status_display }}.</strong>
+      {% if property.status == 'rejected' %}Admin note: {{ property.moderation_note|default:'No reason given.' }} Edit the listing to send it for review again.
+      {% else %}Only you and the admins can see this listing until it is approved.{% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="breadcrumb-gh mb-3">
+    <a href="{% url 'properties:home' %}">Home</a><i class="bi bi-chevron-right small"></i>
+    <a href="{% url 'properties:browse' %}?category={{ property.category }}">{{ property.get_category_display }}</a><i class="bi bi-chevron-right small"></i>
+    <a href="{% url 'properties:browse' %}?division={{ property.division }}">{{ property.get_division_display }}</a><i class="bi bi-chevron-right small"></i>
+    <a href="{% url 'properties:browse' %}?location={{ property.location|urlencode }}">{{ property.location }}</a>
+  </div>
+
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div style="max-width:760px">
+      <div class="d-flex flex-wrap gap-2 mb-2">
+        {% if property.is_featured %}<span class="chip chip-featured"><i class="bi bi-star-fill"></i>Featured</span>{% endif %}
+        <span class="chip chip-soft"><i class="bi {{ property.category|category_icon }}"></i>{{ property.get_category_display }}</span>
+        <span class="chip chip-soft">{{ property.get_property_type_display }}</span>
+        {% if property.tenant_gender == 'male' %}<span class="tag tag-male"><i class="bi bi-gender-male"></i>Male only</span>{% elif property.tenant_gender == 'female' %}<span class="tag tag-female"><i class="bi bi-gender-female"></i>Female only</span>{% endif %}
+        {% if not property.is_available %}<span class="chip chip-dark">Already rented</span>{% endif %}
+      </div>
+      <h1 class="mb-2" style="font-size:clamp(1.5rem,2.6vw,2.1rem)">{{ property.title }}</h1>
+      <div class="text-muted d-flex flex-wrap gap-3 small">
+        <span><i class="bi bi-geo-alt-fill" style="color:var(--gh-primary)"></i> {{ property.full_location }}</span>
+        {% if property.average_rating %}<span><span class="stars">{{ property.average_rating|stars }}</span> {{ property.average_rating }} ({{ reviews|length }} review{{ reviews|length|pluralize }})</span>{% endif %}
+        <span><i class="bi bi-eye"></i> {{ property.view_count|intcomma }} views</span>
+        <span><i class="bi bi-hash"></i>{{ property.reference_code }}</span>
+      </div>
+    </div>
+    <div class="text-lg-end">
+      <div class="detail-price">{{ property.price|taka }} <small>/month</small></div>
+      <div class="mt-2 d-flex gap-2 justify-content-lg-end flex-wrap">
+        {% if property.is_negotiable %}<span class="tag tag-nego">Negotiable</span>{% endif %}
+        <span class="small text-muted">≈ {{ property.monthly_cost|taka }} with bills</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    {% if is_tenant_viewer %}
+      <form method="post" action="{% url 'interactions:favourite_toggle' property.pk %}">{% csrf_token %}
+        <button class="btn btn-sm {% if is_favourite %}btn-primary{% else %}btn-outline-primary{% endif %}"><i class="bi {% if is_favourite %}bi-heart-fill{% else %}bi-heart{% endif %} me-1"></i>{% if is_favourite %}Saved{% else %}Save property{% endif %}</button>
+      </form>
+      {% if in_compare %}
+        <a href="{% url 'interactions:compare' %}" class="btn btn-sm btn-soft"><i class="bi bi-layout-three-columns me-1"></i>In comparison</a>
+      {% else %}
+        <form method="post" action="{% url 'interactions:comparison_add' property.pk %}">{% csrf_token %}
+          <button class="btn btn-sm btn-outline-primary"><i class="bi bi-plus-square me-1"></i>Add to compare</button>
+        </form>
+      {% endif %}
+      {% if has_reported %}<span class="btn btn-sm btn-soft disabled"><i class="bi bi-flag-fill me-1"></i>Reported</span>
+      {% else %}<a href="{% url 'interactions:report_create' property.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-flag me-1"></i>Report</a>{% endif %}
+    {% elif is_owner %}
+      <a href="{% url 'properties:update' property.pk %}" class="btn btn-sm btn-dark"><i class="bi bi-pencil me-1"></i>Edit listing</a>
+      <a href="{% url 'properties:images' property.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-images me-1"></i>Photos</a>
+      <a href="{% url 'properties:utilities' property.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-receipt me-1"></i>Bills</a>
+    {% endif %}
+  </div>
+
+  {% with images=property.images.all %}
+  <div class="gallery count-{% if images|length > 4 %}many{% else %}{{ images|length }}{% endif %} mb-4">
+    {% for img in images|slice:":5" %}
+      <a href="{{ img.image.url }}" data-lightbox>
+        <img src="{{ img.image.url }}" alt="{{ img.caption|default:property.title }}">
+        {% if forloop.counter == 5 and images|length > 5 %}<span class="more">+{{ images|length|add:'-5' }} photos</span>{% endif %}
+      </a>
+    {% empty %}
+      <a href="#" onclick="return false"><div class="placeholder-img"><i class="bi bi-image"></i></div></a>
+    {% endfor %}
+  </div>
+  {% endwith %}
+
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="fact-grid mb-4">
+        {% if property.is_commercial %}
+          <div class="fact"><i class="bi bi-arrows-angle-expand"></i><div><span class="v">{{ property.size|default:'-' }}{% if property.size %} ft²{% endif %}</span><span class="k">Size</span></div></div>
+          <div class="fact"><i class="bi bi-droplet"></i><div><span class="v">{{ property.bathrooms }}</span><span class="k">Washrooms</span></div></div>
+        {% else %}
+          <div class="fact"><i class="bi bi-door-closed"></i><div><span class="v">{{ property.bedrooms }}</span><span class="k">Bedrooms</span></div></div>
+          <div class="fact"><i class="bi bi-droplet"></i><div><span class="v">{{ property.bathrooms }}</span><span class="k">Bathrooms</span></div></div>
+          <div class="fact"><i class="bi bi-flower1"></i><div><span class="v">{{ property.balconies }}</span><span class="k">Balcony</span></div></div>
+          <div class="fact"><i class="bi bi-arrows-angle-expand"></i><div><span class="v">{{ property.size|default:'-' }}{% if property.size %} ft²{% endif %}</span><span class="k">Size</span></div></div>
+        {% endif %}
+        <div class="fact"><i class="bi bi-building"></i><div><span class="v">{{ property.floor_label }}</span><span class="k">Floor</span></div></div>
+      </div>
+
+      <section class="gh-card mb-4">
+        <div class="gh-card-body pb-2"><h5 class="mb-0">Basic information</h5></div>
+        <div class="row g-0">
+          <div class="col-md-6">
+            <table class="info-table">
+              <tr><td><i class="bi bi-hash"></i>Property ID</td><td>{{ property.reference_code }}</td></tr>
+              <tr><td><i class="bi bi-tags"></i>Category</td><td>{{ property.get_category_display }}</td></tr>
+              <tr><td><i class="bi bi-house"></i>Type</td><td>{{ property.get_property_type_display }}</td></tr>
+              <tr><td><i class="bi bi-people"></i>Rent to</td><td>{{ property.get_tenant_gender_display }}</td></tr>
+              <tr><td><i class="bi bi-calendar-event"></i>Available from</td><td>{% if property.available_from %}{{ property.available_from|date:'d M Y' }}{% else %}Now{% endif %}</td></tr>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <table class="info-table">
+              <tr><td><i class="bi bi-lamp"></i>Furnishing</td><td>{{ property.furnished|yesno:'Furnished,Unfurnished' }}</td></tr>
+              <tr><td><i class="bi bi-car-front"></i>Parking</td><td>{{ property.parking|yesno:'Available,Not available' }}</td></tr>
+              <tr><td><i class="bi bi-heart-pulse"></i>Pets</td><td>{{ property.pet_friendly|yesno:'Allowed,Not allowed' }}</td></tr>
+              <tr><td><i class="bi bi-cash-stack"></i>Advance</td><td>{{ property.advance_months }} month{{ property.advance_months|pluralize }}</td></tr>
+              <tr><td><i class="bi bi-clock-history"></i>Updated</td><td>{{ property.updated_at|naturalday:'d M Y' }}</td></tr>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="gh-card gh-card-body mb-4">
+        <h5 class="mb-3">Description</h5>
+        <p class="mb-0" style="white-space:pre-line;line-height:1.75">{{ property.description }}</p>
+      </section>
+
+      {% if property.amenities.all %}
+      <section class="gh-card gh-card-body mb-4">
+        <h5 class="mb-3">Amenities</h5>
+        {% for a in property.amenities.all %}<span class="amenity"><i class="bi {{ a.icon }}"></i>{{ a.name }}</span>{% endfor %}
+      </section>
+      {% endif %}
+
+      {% if property.house_rules or property.gate_closing_time %}
+      <section class="gh-card gh-card-body mb-4">
+        <h5 class="mb-3">House rules</h5>
+        <div class="rules-box">
+          {% if property.gate_closing_time %}<p class="fw-bold mb-2"><i class="bi bi-door-closed me-1"></i> Main gate closes at {{ property.gate_closing_time|time:'g:i A' }}</p>{% endif %}
+          {% if property.house_rules %}<p class="mb-0" style="white-space:pre-line">{{ property.house_rules }}</p>{% endif %}
+        </div>
+      </section>
+      {% endif %}
+
+      <section class="gh-card gh-card-body mb-4">
+        <h5 class="mb-3"><i class="bi bi-geo-alt me-1" style="color:var(--gh-primary)"></i>Location</h5>
+        <div class="row g-2 small">
+          <div class="col-6 col-md-3"><div class="text-muted">Division</div><div class="fw-bold">{{ property.get_division_display }}</div></div>
+          <div class="col-6 col-md-3"><div class="text-muted">City / district</div><div class="fw-bold">{{ property.city }}</div></div>
+          <div class="col-6 col-md-3"><div class="text-muted">Area</div><div class="fw-bold">{{ property.location }}</div></div>
+          <div class="col-6 col-md-3"><div class="text-muted">Address</div><div class="fw-bold">{% if can_contact %}{{ property.address }}{% else %}<i class="bi bi-lock-fill"></i> Locked{% endif %}</div></div>
+        </div>
+      </section>
+
+      <section class="gh-card gh-card-body mb-4" id="reviews">
+        <h5 class="mb-3">Tenant reviews {% if reviews %}<span class="text-muted fs-6">({{ reviews|length }})</span>{% endif %}</h5>
+
+        {% if is_tenant_viewer %}
+          {% if my_review %}
+            <div class="rounded-3 p-3 mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2" style="background:var(--gh-soft)">
+              <span class="fw-semibold"><i class="bi bi-check-circle-fill text-success me-1"></i> You reviewed this property.</span>
+              <div class="d-flex gap-2">
+                <a href="{% url 'interactions:review_update' my_review.pk %}" class="btn btn-sm btn-light">Edit</a>
+                <form method="post" action="{% url 'interactions:review_delete' my_review.pk %}" data-confirm="Delete your review?">{% csrf_token %}<button class="btn btn-sm btn-outline-danger">Delete</button></form>
+              </div>
+            </div>
+          {% elif can_review %}
+            <div class="rounded-3 p-3 mb-3 border">
+              <h6 class="mb-3">Share your experience</h6>
+              <form method="post" action="{% url 'interactions:review_create' property.pk %}">{% csrf_token %}
+                {% include 'partials/star_input.html' with field=review_form.rating label='Property' %}
+                {% include 'partials/star_input.html' with field=review_form.landlord_rating label='Landlord' %}
+                {% include 'partials/field.html' with field=review_form.comment %}
+                <button class="btn btn-primary">Publish review</button>
+              </form>
+            </div>
+          {% else %}
+            <p class="small text-muted"><i class="bi bi-info-circle"></i> You can review this place after the landlord approves your visit or rental request.</p>
+          {% endif %}
+        {% endif %}
+
+        {% for r in reviews %}
+          <div class="review">
+            <div class="d-flex justify-content-between flex-wrap gap-2 mb-1">
+              <div class="d-flex align-items-center gap-2">
+                <span class="avatar">{{ r.tenant.initials }}</span>
+                <div><div class="fw-bold">{{ r.tenant.display_name }}</div><div class="small text-muted">{{ r.created_at|naturaltime }}</div></div>
+              </div>
+              <div class="text-end small">
+                <div><span class="stars">{{ r.rating|stars }}</span> property</div>
+                {% if r.landlord_rating %}<div class="text-muted"><span class="stars">{{ r.landlord_rating|stars }}</span> landlord</div>{% endif %}
+              </div>
+            </div>
+            <p class="mb-0 mt-2">{{ r.comment }}</p>
+          </div>
+        {% empty %}
+          <p class="text-muted mb-0">No reviews yet.</p>
+        {% endfor %}
+      </section>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="sticky-side d-grid gap-3">
+        <div class="gh-card gh-card-body">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            {% if property.landlord.avatar %}<img src="{{ property.landlord.avatar.url }}" class="avatar" style="width:54px;height:54px" alt="">{% else %}<span class="avatar" style="width:54px;height:54px;font-size:1rem">{{ property.landlord.initials }}</span>{% endif %}
+            <div>
+              <div class="small text-muted">Posted by</div>
+              <div class="fw-bold">{{ property.landlord.display_name }}</div>
+              {% if property.landlord.landlord_profile.is_verified %}<span class="verified-badge small"><i class="bi bi-patch-check-fill"></i> Verified landlord</span>
+              {% else %}<span class="small text-muted">Verification pending</span>{% endif %}
+            </div>
+          </div>
+          {% if can_contact %}
+            <div class="d-grid gap-2">
+              {% if property.landlord.phone %}<a href="tel:{{ property.landlord.phone }}" class="btn btn-primary"><i class="bi bi-telephone-fill me-1"></i>{{ property.landlord.phone }}</a>{% endif %}
+              <a href="mailto:{{ property.landlord.email }}" class="btn btn-outline-primary"><i class="bi bi-envelope me-1"></i>Send email</a>
+            </div>
+          {% else %}
+            <div class="contact-locked">
+              <i class="bi bi-shield-lock fs-3" style="color:var(--gh-primary)"></i>
+              <p class="small mb-0 mt-1">Phone number and exact address unlock once the landlord accepts your visit or rental request.</p>
+            </div>
+          {% endif %}
+        </div>
+
+        {% if is_tenant_viewer and property.is_available %}
+        <div class="gh-card gh-card-body">
+          <ul class="nav nav-pills-gh gap-1 mb-3" role="tablist">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-visit" type="button"><i class="bi bi-calendar-plus me-1"></i>Book a visit</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-rent" type="button"><i class="bi bi-key me-1"></i>Apply</button></li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="tab-visit">
+              {% if active_visit %}
+                <div class="text-center py-2">
+                  <span class="status status-{{ active_visit.status }}">{{ active_visit.get_status_display }}</span>
+                  <p class="mt-2 mb-2 fw-semibold">{{ active_visit.preferred_date|date:'D, d M' }} · {{ active_visit.get_time_slot_display }}</p>
+                  <a href="{% url 'interactions:visits' %}" class="small">Manage my visits</a>
+                </div>
+              {% else %}
+              <form method="post" action="{% url 'interactions:visit_create' property.pk %}">{% csrf_token %}
+                {% include 'partials/field.html' with field=visit_form.preferred_date %}
+                {% include 'partials/field.html' with field=visit_form.time_slot %}
+                {% include 'partials/field.html' with field=visit_form.message %}
+                <button class="btn btn-accent w-100"><i class="bi bi-calendar-check me-1"></i>Request visit</button>
+              </form>
+              {% endif %}
+            </div>
+            <div class="tab-pane fade" id="tab-rent">
+              {% if active_rental %}
+                <div class="text-center py-2">
+                  <span class="status status-{{ active_rental.status }}">{{ active_rental.get_status_display }}</span>
+                  <p class="mt-2 mb-2 fw-semibold">Move-in {{ active_rental.move_in_date|date:'d M Y' }}</p>
+                  <a href="{% url 'interactions:rentals' %}" class="small">Track application</a>
+                </div>
+              {% else %}
+              <form method="post" action="{% url 'interactions:rental_create' property.pk %}">{% csrf_token %}
+                {% include 'partials/field.html' with field=rental_form.move_in_date %}
+                <div class="row g-2">
+                  <div class="col-6">{% include 'partials/field.html' with field=rental_form.duration_months %}</div>
+                  <div class="col-6">{% include 'partials/field.html' with field=rental_form.occupants %}</div>
+                </div>
+                {% include 'partials/field.html' with field=rental_form.message %}
+                <button class="btn btn-primary w-100"><i class="bi bi-send me-1"></i>Send application</button>
+              </form>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% elif not user.is_authenticated %}
+        <div class="gh-card gh-card-body text-center">
+          <i class="bi bi-person-lock fs-2" style="color:var(--gh-primary)"></i>
+          <p class="mb-3 fw-semibold">Log in to see contact details, book a visit or apply to rent.</p>
+          <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-primary w-100">Log in</a>
+          <a href="{% url 'accounts:register' %}" class="small d-block mt-2">New here? Create a free account</a>
+        </div>
+        {% endif %}
+
+        <div class="cost-box">
+          <div class="fw-bold mb-2"><i class="bi bi-receipt me-1" style="color:var(--gh-primary)"></i>Estimated monthly cost</div>
+          <div class="cost-row"><span>Rent</span><span>{{ property.price|taka }}</span></div>
+          <div class="cost-row"><span>Service charge</span><span>{{ property.service_charge|taka }}</span></div>
+          {% for u in property.utilities.all %}
+            <div class="cost-row"><span>{{ u.get_name_display }}{% if u.billing_period == 'yearly' %} <small>(yearly ÷ 12)</small>{% endif %}</span>
+              <span>{% if u.included_in_rent %}<em class="text-success fw-semibold">Included</em>{% else %}{{ u.monthly_amount|taka }}{% endif %}</span></div>
+          {% endfor %}
+          <div class="cost-total"><span class="fw-bold">Total / month</span><span class="amount">{{ property.monthly_cost|taka }}</span></div>
+          <div class="small text-muted mt-2">+ {{ property.advance_months }} month{{ property.advance_months|pluralize }} advance ({{ property.advance_amount|taka }})</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if similar %}
+  <section class="mt-5">
+    <h3 class="mb-4">Similar properties</h3>
+    <div class="row g-4">{% for p in similar %}<div class="col-sm-6 col-lg-3">{% include 'partials/property_card.html' with compact=True %}</div>{% endfor %}</div>
+  </section>
+  {% endif %}
+</div>
+
+<div class="modal fade" id="lightbox" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content bg-transparent border-0">
+      <div class="position-relative">
+        <img src="" class="w-100 rounded-4" style="max-height:82vh;object-fit:contain" alt="">
+        <button class="btn btn-light btn-icon position-absolute top-50 start-0 translate-middle-y ms-2" data-prev><i class="bi bi-chevron-left"></i></button>
+        <button class="btn btn-light btn-icon position-absolute top-50 end-0 translate-middle-y me-2" data-next><i class="bi bi-chevron-right"></i></button>
+        <button class="btn btn-light btn-icon position-absolute top-0 end-0 m-2" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

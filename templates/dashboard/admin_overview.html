@@ -1,0 +1,45 @@
+{% extends 'dashboard/_admin_base.html' %}
+{% load ghorify_tags %}
+{% block title %}Admin overview{% endblock %}
+{% block admin_content %}
+<h1 class="mb-4" style="font-size:2rem">Platform overview</h1>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-xl-3"><div class="stat-card"><div class="ic"><i class="bi bi-people"></i></div><div><div class="num">{{ stats.users }}</div><div class="lbl">{{ stats.tenants }} tenants · {{ stats.landlords }} landlords</div></div></div></div>
+  <div class="col-6 col-xl-3"><div class="stat-card"><div class="ic"><i class="bi bi-broadcast"></i></div><div><div class="num">{{ stats.published }}</div><div class="lbl">Live listings</div></div></div></div>
+  <div class="col-6 col-xl-3"><div class="stat-card"><div class="ic"><i class="bi bi-key"></i></div><div><div class="num">{{ stats.rentals_done }}</div><div class="lbl">Homes rented</div></div></div></div>
+  <div class="col-6 col-xl-3"><a href="{% url 'dashboard:reports' %}" class="stat-card text-reset"><div class="ic" style="background:#fbe4e4;color:#c23b3b"><i class="bi bi-flag"></i></div><div><div class="num">{{ stats.open_reports }}</div><div class="lbl">Open reports</div></div></a></div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-6"><a href="{% url 'dashboard:moderation' %}" class="stat-card text-reset"><div class="ic" style="background:#fff4df;color:#9a6510"><i class="bi bi-hourglass-split"></i></div><div><div class="num">{{ stats.pending_properties }}</div><div class="lbl">Listings waiting for review</div></div></a></div>
+  <div class="col-md-6"><a href="{% url 'dashboard:landlords' %}" class="stat-card text-reset"><div class="ic" style="background:#fff4df;color:#9a6510"><i class="bi bi-person-check"></i></div><div><div class="num">{{ stats.pending_landlords }}</div><div class="lbl">Landlords waiting for verification</div></div></a></div>
+</div>
+
+<div class="row g-4">
+  <div class="col-xl-7">
+    <div class="gh-card gh-card-body">
+      <div class="gh-card-title"><i class="bi bi-hourglass"></i> Latest pending listings</div>
+      {% for p in latest_pending %}
+        <div class="d-flex justify-content-between align-items-center gap-2 {% if not forloop.last %}mb-3{% endif %}">
+          <div><a href="{{ p.get_absolute_url }}" class="fw-semibold text-reset small">{{ p.title }}</a>
+            <div class="small text-muted">{{ p.landlord }} · {% if p.landlord.landlord_profile.is_verified %}<span class="text-success">verified</span>{% else %}<span style="color:#9a6510;font-weight:600">unverified</span>{% endif %}</div></div>
+          <span class="small fw-semibold">{{ p.price|taka }}</span>
+        </div>
+      {% empty %}<p class="small text-muted mb-0">Nothing waiting. Nice!</p>{% endfor %}
+    </div>
+  </div>
+  <div class="col-xl-5">
+    <div class="gh-card gh-card-body">
+      <div class="gh-card-title"><i class="bi bi-geo-alt"></i> Listings by area</div>
+      {% with top=area_breakdown.0.n %}
+      {% for row in area_breakdown %}
+        <div class="mb-3">
+          <div class="d-flex justify-content-between small fw-semibold mb-1"><span>{{ row.location }}</span><span>{{ row.n }}</span></div>
+          <div class="bar"><span style="width:{% widthratio row.n top 100 %}%"></span></div>
+        </div>
+      {% empty %}<p class="small text-muted mb-0">No live listings yet.</p>{% endfor %}
+      {% endwith %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load ghorify_tags humanize %}
+{% block title %}My listings{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header d-flex flex-wrap justify-content-between align-items-end gap-3">
+    <div><span class="eyebrow">Landlord</span><h1>My listings</h1></div>
+    <a href="{% url 'properties:create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Add a property</a>
+  </div>
+
+  {% if not user.landlord_profile.is_verified %}
+  <div class="alert alert-warning rounded-4 d-flex gap-3 align-items-center">
+    <i class="bi bi-patch-exclamation fs-4"></i>
+    <div class="flex-grow-1">Your account is not verified yet, so listings cannot be published. <a href="{% url 'accounts:profile' %}" class="fw-bold">Upload your documents</a>.</div>
+  </div>
+  {% endif %}
+
+  <ul class="nav nav-pills-gh gap-1 mb-4">
+    <li><a class="nav-link {% if not active_status %}active{% endif %}" href="?">All</a></li>
+    <li><a class="nav-link {% if active_status == 'approved' %}active{% endif %}" href="?status=approved">Published</a></li>
+    <li><a class="nav-link {% if active_status == 'pending' %}active{% endif %}" href="?status=pending">Pending</a></li>
+    <li><a class="nav-link {% if active_status == 'rejected' %}active{% endif %}" href="?status=rejected">Rejected</a></li>
+  </ul>
+
+  {% if properties %}
+  <div class="gh-card overflow-hidden">
+    <div class="table-responsive">
+      <table class="gh-table">
+        <thead><tr><th>Property</th><th>Rent</th><th>Status</th><th>Availability</th><th>Views</th><th class="text-end">Actions</th></tr></thead>
+        <tbody>
+        {% for p in properties %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-3">
+                {% with img=p.primary_image %}{% if img %}<img src="{{ img.image.url }}" class="mini-thumb" alt="">{% else %}<span class="mini-thumb"><i class="bi bi-image"></i></span>{% endif %}{% endwith %}
+                <div><a href="{{ p.get_absolute_url }}" class="fw-bold text-reset">{{ p.title }}</a><div class="small text-muted">{{ p.location }} · {{ p.get_category_display }}</div></div>
+              </div>
+            </td>
+            <td class="fw-semibold">{{ p.price|taka }}</td>
+            <td><span class="status status-{{ p.status }}">{{ p.get_status_display }}</span>
+              {% if p.status == 'rejected' and p.moderation_note %}<div class="small text-danger mt-1" style="max-width:220px">{{ p.moderation_note }}</div>{% endif %}</td>
+            <td>
+              <form method="post" action="{% url 'properties:toggle_availability' p.pk %}">{% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button class="btn btn-sm {% if p.is_available %}btn-soft{% else %}btn-outline-primary{% endif %}">{% if p.is_available %}<i class="bi bi-circle-fill text-success small me-1"></i>Available{% else %}Rented out{% endif %}</button>
+              </form>
+            </td>
+            <td>{{ p.view_count|intcomma }}</td>
+            <td class="text-end text-nowrap">
+              <a href="{% url 'properties:images' p.pk %}" class="btn btn-sm btn-soft" title="Photos"><i class="bi bi-images"></i></a>
+              <a href="{% url 'properties:utilities' p.pk %}" class="btn btn-sm btn-soft" title="Bills"><i class="bi bi-receipt"></i></a>
+              <a href="{% url 'properties:update' p.pk %}" class="btn btn-sm btn-soft" title="Edit"><i class="bi bi-pencil"></i></a>
+              <a href="{% url 'properties:delete' p.pk %}" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+    {% url 'properties:create' as new_url %}
+    {% include 'partials/empty.html' with icon='bi-house-add' title='No listings here' text='Add your first property and start receiving visit requests.' link=new_url link_label='Add a property' %}
+  {% endif %}
+</div>
+{% endblock %}

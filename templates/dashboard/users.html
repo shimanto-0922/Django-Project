@@ -1,0 +1,42 @@
+{% extends 'dashboard/_admin_base.html' %}
+{% block title %}Users{% endblock %}
+{% block admin_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <h1 class="mb-0" style="font-size:2rem">Users</h1>
+  <form method="get" class="d-flex gap-2">
+    <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
+      <option value="">All roles</option>
+      {% for key, label in roles %}<option value="{{ key }}" {% if role == key %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <input name="q" value="{{ q }}" class="form-control form-control-sm" placeholder="Search name or email">
+    <button class="btn btn-sm btn-dark">Go</button>
+  </form>
+</div>
+<div class="gh-card overflow-hidden">
+  <div class="table-responsive">
+    <table class="gh-table">
+      <thead><tr><th>User</th><th>Role</th><th>Joined</th><th>Listings</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      {% for u in page.object_list %}
+        <tr>
+          <td><div class="d-flex align-items-center gap-2"><span class="avatar">{{ u.initials }}</span><div><div class="fw-semibold">{{ u.display_name }}</div><div class="small text-muted">{{ u.email }}</div></div></div></td>
+          <td>{{ u.get_role_display }}</td>
+          <td class="small">{{ u.date_joined|date:'d M Y' }}</td>
+          <td>{{ u.listing_count }}</td>
+          <td>{% if u.is_active %}<span class="status status-approved">Active</span>{% else %}<span class="status status-cancelled">Disabled</span>{% endif %}</td>
+          <td class="text-end">
+            {% if u != user and not u.is_superuser %}
+            <form method="post" action="{% url 'dashboard:toggle_user' u.pk %}">{% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <button class="btn btn-sm {% if u.is_active %}btn-outline-danger{% else %}btn-soft{% endif %}">{% if u.is_active %}Disable{% else %}Enable{% endif %}</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% include 'partials/pagination.html' with query_string='role='|add:role|add:'&q='|add:q %}
+{% endblock %}

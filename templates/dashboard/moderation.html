@@ -1,0 +1,43 @@
+{% extends 'dashboard/_admin_base.html' %}
+{% load ghorify_tags %}
+{% block title %}Listing moderation{% endblock %}
+{% block admin_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <h1 class="mb-0" style="font-size:2rem">Listings</h1>
+  <div class="btn-group">{% for key, label in status_choices %}<a href="?status={{ key }}" class="btn btn-sm {% if status == key %}btn-dark{% else %}btn-soft{% endif %}">{{ label }}</a>{% endfor %}</div>
+</div>
+
+{% for p in page.object_list %}
+<div class="request-card">
+  <div class="d-flex flex-wrap gap-3">
+    {% with img=p.primary_image %}{% if img %}<img src="{{ img.image.url }}" class="mini-thumb" style="width:110px;height:84px" alt="">{% else %}<span class="mini-thumb" style="width:110px;height:84px"><i class="bi bi-image"></i></span>{% endif %}{% endwith %}
+    <div class="flex-grow-1">
+      <a href="{{ p.get_absolute_url }}" class="fw-bold text-reset" target="_blank">{{ p.title }} <i class="bi bi-box-arrow-up-right small"></i></a>
+      <div class="small text-muted">{{ p.location }} · {{ p.get_category_display }} · {{ p.price|taka }} · {{ p.images.all|length }} photo{{ p.images.all|length|pluralize }}</div>
+      <div class="small mt-1">By <strong>{{ p.landlord.display_name }}</strong>
+        {% if p.landlord.landlord_profile.is_verified %}<span class="verified-badge"><i class="bi bi-patch-check-fill"></i> verified</span>
+        {% else %}<span class="status status-pending ms-1">Landlord not verified</span>{% endif %}
+        {% if p.open_reports %}<span class="status status-rejected ms-1">{{ p.open_reports }} open report{{ p.open_reports|pluralize }}</span>{% endif %}
+      </div>
+      {% if p.moderation_note %}<div class="small text-danger mt-1">Note: {{ p.moderation_note }}</div>{% endif %}
+    </div>
+    <span class="status status-{{ p.status }} align-self-start">{{ p.get_status_display }}</span>
+  </div>
+  <form method="post" action="{% url 'dashboard:moderate' p.pk %}" class="d-flex flex-wrap gap-2 mt-3">{% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <input name="note" class="form-control form-control-sm flex-grow-1" style="max-width:460px" placeholder="Reason (required to reject)">
+    {% if p.status != 'approved' %}<button name="decision" value="approve" class="btn btn-sm btn-primary"><i class="bi bi-check-lg me-1"></i>Approve</button>{% endif %}
+    {% if p.status != 'rejected' %}<button name="decision" value="reject" class="btn btn-sm btn-outline-danger">Reject</button>{% endif %}
+  </form>
+  {% if p.status == 'approved' %}
+  <form method="post" action="{% url 'dashboard:toggle_featured' p.pk %}" class="mt-2">{% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <button class="btn btn-sm {% if p.is_featured %}btn-soft{% else %}btn-outline-primary{% endif %}"><i class="bi {% if p.is_featured %}bi-star-fill text-warning{% else %}bi-star{% endif %} me-1"></i>{% if p.is_featured %}Featured · remove{% else %}Mark as featured{% endif %}</button>
+  </form>
+  {% endif %}
+</div>
+{% empty %}
+  {% include 'partials/empty.html' with icon='bi-inbox' title='Queue is empty' text='No listings with this status.' %}
+{% endfor %}
+{% include 'partials/pagination.html' with query_string='status='|add:status %}
+{% endblock %}

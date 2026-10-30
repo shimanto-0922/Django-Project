@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load ghorify_tags %}
+{% block title %}Smart match{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <span class="eyebrow"><i class="bi bi-stars"></i> Smart match</span>
+    <h1>Homes ranked by how well they fit you</h1>
+    <p class="text-muted mb-0">Fill in only what matters to you. Empty fields never lower a score.</p>
+  </div>
+
+  <div class="row g-4">
+    <aside class="col-lg-4 col-xl-3">
+      <form method="get" class="gh-card gh-card-body sticky-side" id="searchForm" style="max-height:calc(100vh - 110px);overflow:auto">
+        <input type="hidden" name="mode" value="{{ mode }}">
+        {% include 'search/_criteria_fields.html' %}
+        <button class="btn btn-primary w-100"><i class="bi bi-search me-1"></i>Find matches</button>
+        {% if has_query %}<a href="{% url 'search:search' %}" class="btn btn-soft w-100 mt-2">Reset</a>{% endif %}
+      </form>
+    </aside>
+
+    <section class="col-lg-8 col-xl-9">
+      {% if has_query %}
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+          <div>
+            <h5 class="mb-0">{{ total }} home{{ total|pluralize }} found</h5>
+            <div class="small text-muted">{% if mode == 'smart' %}Showing homes with at least {{ threshold }}% match, best first{% else %}Showing only homes that meet every condition{% endif %}</div>
+          </div>
+          <div class="d-flex gap-2 flex-wrap">
+            <div class="btn-group" role="group">
+              <button type="submit" form="searchForm" class="btn btn-sm {% if mode == 'smart' %}btn-dark{% else %}btn-soft{% endif %}" onclick="document.querySelector('#searchForm [name=mode]').value='smart'">Smart</button>
+              <button type="submit" form="searchForm" class="btn btn-sm {% if mode == 'basic' %}btn-dark{% else %}btn-soft{% endif %}" onclick="document.querySelector('#searchForm [name=mode]').value='basic'">Strict</button>
+            </div>
+            {% if user.is_authenticated and user.is_tenant %}
+              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#saveModal"><i class="bi bi-bookmark-plus me-1"></i>Save search</button>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if page.object_list %}
+          <div class="d-grid gap-3">
+          {% for m in page.object_list %}{% with p=m.property %}
+            <article class="gh-card overflow-hidden">
+              <div class="row g-0">
+                <div class="col-md-4">
+                  <a href="{{ p.get_absolute_url }}" class="d-block h-100 position-relative" style="min-height:200px;background:var(--gh-soft)">
+                    {% with img=p.primary_image %}{% if img %}<img src="{{ img.image.url }}" class="position-absolute top-0 start-0 w-100 h-100" style="object-fit:cover" alt="">{% else %}<div class="placeholder-img" style="min-height:200px"><i class="bi bi-house-door"></i></div>{% endif %}{% endwith %}
+                  </a>
+                </div>
+                <div class="col-md-8">
+                  <div class="p-4 d-flex gap-3">
+                    <div class="flex-grow-1">
+                      <div class="small text-muted mb-1">{{ p.get_category_display }} · {{ p.get_property_type_display }} · <i class="bi bi-geo-alt"></i> {{ p.location }}</div>
+                      <a href="{{ p.get_absolute_url }}" class="h5 text-reset d-block mb-2">{{ p.title }}</a>
+                      <div class="d-flex flex-wrap gap-3 small mb-3">
+                        <span><strong class="fs-5" style="color:var(--gh-dark)">{{ p.price|taka }}</strong> rent</span>
+                        <span class="text-muted">≈ {{ p.monthly_cost|taka }} with bills</span>
+                        <span class="text-muted"><i class="bi bi-door-closed"></i> {{ p.bedrooms }} · <i class="bi bi-droplet"></i> {{ p.bathrooms }}</span>
+                      </div>
+                      <div>{% for label, score in m.reasons %}<span class="reason {{ score|reason_class }}">{% if score >= 1 %}<i class="bi bi-check2"></i>{% elif score > 0 %}<i class="bi bi-dash"></i>{% else %}<i class="bi bi-x"></i>{% endif %} {{ label }}</span>{% endfor %}</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="match-ring" style="--p:{{ m.percentage }};--c:{{ m.percentage|match_color }}"><span>{{ m.percentage }}%</span></div>
+                      <div class="small fw-bold mt-1 text-capitalize" style="color:{{ m.percentage|match_color }}">{{ m.level }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          {% endwith %}{% endfor %}
+          </div>
+          {% include 'partials/pagination.html' %}
+        {% else %}
+          {% include 'partials/empty.html' with icon='bi-binoculars' title='No good matches yet' text='Try a higher budget, a nearby area, or switch to Smart mode to see close matches.' %}
+        {% endif %}
+      {% else %}
+        <div class="gh-card gh-card-body p-5 text-center">
+          <div class="empty-state p-0"><div class="ic"><i class="bi bi-stars"></i></div></div>
+          <h4>How matching works</h4>
+          <p class="text-muted mx-auto" style="max-width:520px">Every preference you set has a weight: budget 30, area 20, bedrooms 15, bathrooms 10, category 10, amenities 10, and smaller weights for keyword, type, parking, pets and furnishing. A home earns full or partial points for each one, and the total becomes its match %.</p>
+          <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+            <span class="reason yes"><i class="bi bi-check2"></i> fully matched</span>
+            <span class="reason part"><i class="bi bi-dash"></i> close (e.g. 10% over budget)</span>
+            <span class="reason no"><i class="bi bi-x"></i> not matched</span>
+          </div>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+</div>
+
+{% if user.is_authenticated and user.is_tenant and has_query %}
+<div class="modal fade" id="saveModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <form method="post" action="{% url 'search:save' %}" class="modal-content rounded-4 border-0">{% csrf_token %}
+      <div class="modal-body p-4">
+        <h5 class="mb-3">Save this search</h5>
+        <label class="form-label" for="save-name">Name</label>
+        <input id="save-name" name="name" class="form-control" placeholder="e.g. Family flat near office" required maxlength="80">
+        {% for key, values in request.GET.lists %}{% if key != 'mode' and key != 'page' %}{% for v in values %}<input type="hidden" name="{{ key }}" value="{{ v }}">{% endfor %}{% endif %}{% endfor %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      </div>
+      <div class="modal-footer border-0 pt-0 px-4 pb-4">
+        <button type="button" class="btn btn-soft" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

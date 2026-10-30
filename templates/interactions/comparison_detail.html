@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load ghorify_tags %}
+{% block title %}Compare · {{ comparison.name }}{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header d-flex flex-wrap justify-content-between align-items-end gap-3">
+    <div>
+      <span class="eyebrow">Compare up to 3 homes</span>
+      <h1>{{ comparison.name }}</h1>
+      <p class="text-muted mb-0">{{ items|length }}/3 properties · the best value in each row is highlighted</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+      <button class="btn btn-soft btn-sm" data-bs-toggle="collapse" data-bs-target="#renameBox"><i class="bi bi-pencil me-1"></i>Rename</button>
+      <form method="post" action="{% url 'interactions:comparison_create' %}">{% csrf_token %}<button class="btn btn-outline-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>New comparison</button></form>
+      <form method="post" action="{% url 'interactions:comparison_delete' comparison.pk %}" data-confirm="Delete this comparison?">{% csrf_token %}<button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button></form>
+    </div>
+  </div>
+
+  <div class="collapse mb-4" id="renameBox">
+    <form method="post" action="{% url 'interactions:comparison_rename' comparison.pk %}" class="d-flex gap-2" style="max-width:420px">{% csrf_token %}
+      {{ rename_form.name|bs }}<button class="btn btn-dark">Save</button>
+    </form>
+  </div>
+
+  {% if items %}
+  <div class="gh-card overflow-hidden">
+    <div class="table-responsive">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="background:#fff"></th>
+            {% for item in items %}{% with p=item.property %}
+            <td class="compare-head p-3" style="min-width:220px;vertical-align:top">
+              {% with img=p.primary_image %}{% if img %}<img src="{{ img.image.url }}" alt="">{% else %}<div class="placeholder-img"><i class="bi bi-house"></i></div>{% endif %}{% endwith %}
+              <a href="{{ p.get_absolute_url }}" class="d-block fw-bold text-reset mt-2">{{ p.title }}</a>
+              <form method="post" action="{% url 'interactions:comparison_remove' item.pk %}" class="mt-2">{% csrf_token %}<button class="btn btn-sm btn-soft"><i class="bi bi-x-lg me-1"></i>Remove</button></form>
+            </td>
+            {% endwith %}{% endfor %}
+            {% if items|length < 3 %}
+            <td class="p-3" style="min-width:200px;vertical-align:middle">
+              <a href="{% url 'properties:browse' %}" class="d-grid place-items-center text-center p-4 rounded-4" style="border:2px dashed var(--gh-soft-2);color:var(--gh-primary)">
+                <i class="bi bi-plus-circle fs-2"></i><span class="fw-semibold small mt-1">Add a property</span>
+              </a>
+            </td>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+          <tr>
+            <th>{{ row.label }}</th>
+            {% for v in row.values %}
+              <td class="{% if forloop.counter0 == row.best %}best{% endif %}">
+                {% if v|is_bool %}{% if v %}<i class="bi bi-check-circle-fill text-success fs-5"></i>{% else %}<i class="bi bi-dash-circle text-muted fs-5"></i>{% endif %}{% else %}{{ v }}{% endif %}
+              </td>
+            {% endfor %}
+            {% if items|length < 3 %}<td></td>{% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+    {% url 'properties:browse' as browse_url %}
+    {% include 'partials/empty.html' with icon='bi-layout-three-columns' title='Nothing to compare yet' text='Press "Compare" on up to three listings to see them side by side.' link=browse_url link_label='Browse homes' %}
+  {% endif %}
+
+  {% if others %}
+  <h5 class="mt-5 mb-3">Other comparisons</h5>
+  <div class="row g-3">
+    {% for c in others %}
+    <div class="col-md-4">
+      <div class="gh-card gh-card-body d-flex justify-content-between align-items-center">
+        <a href="{% url 'interactions:comparison' c.pk %}" class="text-reset"><div class="fw-bold">{{ c.name }}</div><div class="small text-muted">{{ c.n }} propert{{ c.n|pluralize:"y,ies" }}</div></a>
+        <form method="post" action="{% url 'interactions:comparison_activate' c.pk %}">{% csrf_token %}<button class="btn btn-sm btn-soft" title="Make active">Use</button></form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

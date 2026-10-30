@@ -1,0 +1,7 @@
+<div class="mb-2 d-flex align-items-center gap-3">
+  <span class="fw-semibold small" style="width:70px">{{ label }}</span>
+  <div class="star-input">
+    {% for opt in field %}{{ opt.tag }}<label for="{{ opt.id_for_label }}" title="{{ opt.choice_label }} stars">★</label>{% endfor %}
+  </div>
+</div>
+{{ field.errors }}

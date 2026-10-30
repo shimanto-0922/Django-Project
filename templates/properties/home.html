@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static ghorify_tags humanize %}
+{% block title %}Flats, rooms &amp; sublets for rent{% endblock %}
+{% block content %}
+<section class="hero" style="--hero-img:url('{% static 'img/photos/hero.jpg' %}')">
+  <div class="container">
+    <span class="hero-badge mb-3"><i class="bi bi-patch-check-fill"></i> Every landlord is verified with NID</span>
+    <h1 class="mb-3">Find your next <span>home for rent</span> in Bangladesh</h1>
+    <p class="lead mb-4">Family flats, bachelor rooms, sublets, hostel seats, offices and shops. See the real monthly cost, compare homes and book a visit online.</p>
+
+    <form action="{% url 'properties:browse' %}" method="get" class="search-panel">
+      <div class="search-tabs">
+        <input type="radio" name="category" id="t-all" value="" checked><label for="t-all"><i class="bi bi-grid"></i>All</label>
+        {% for c in categories %}
+          <input type="radio" name="category" id="t-{{ c.key }}" value="{{ c.key }}"><label for="t-{{ c.key }}"><i class="bi {{ c.icon }}"></i>{{ c.label }}</label>
+        {% endfor %}
+      </div>
+      <div class="search-fields">
+        <div class="sf">
+          <label for="h-loc">Location</label>
+          <input id="h-loc" name="location" class="form-control" placeholder="Area or city, e.g. Dhanmondi" list="area-list" autocomplete="off">
+          {% area_datalist %}
+        </div>
+        <div class="sf">
+          <label for="h-type">Property type</label>
+          <select id="h-type" name="property_type" class="form-select">
+            <option value="">Any type</option>
+            <option value="apartment">Apartment / Flat</option><option value="room">Single room</option>
+            <option value="seat">Seat</option><option value="house">Full house</option>
+            <option value="studio">Studio</option><option value="commercial">Commercial space</option>
+          </select>
+        </div>
+        <div class="sf">
+          <label for="h-max">Max rent (৳)</label>
+          <select id="h-max" name="max_price" class="form-select">
+            <option value="">No limit</option>
+            <option value="5000">5,000</option><option value="10000">10,000</option><option value="15000">15,000</option>
+            <option value="20000">20,000</option><option value="30000">30,000</option><option value="50000">50,000</option>
+            <option value="80000">80,000</option><option value="150000">1,50,000</option>
+          </select>
+        </div>
+        <button class="btn btn-accent btn-lg"><i class="bi bi-search me-1"></i> Search</button>
+      </div>
+    </form>
+
+    <div class="hero-stats">
+      <div><div class="n">{{ stats.listings|intcomma }}</div><div class="l">Verified listings</div></div>
+      <div><div class="n">{{ stats.areas }}</div><div class="l">Areas covered</div></div>
+      <div><div class="n">{{ stats.landlords }}</div><div class="l">Trusted landlords</div></div>
+      <div><a href="{% url 'search:search' %}" class="text-white fw-bold"><i class="bi bi-stars"></i> Try Smart match <i class="bi bi-arrow-right"></i></a><div class="l">Homes ranked by your needs</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section pb-4">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h2 class="section-title mb-0">What are you looking for?</h2>
+      <p class="section-sub">Browse rentals by category</p>
+    </div>
+    <div class="row g-3">
+      {% for c in categories %}
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="{% url 'properties:browse' %}?category={{ c.key }}" class="category-tile">
+          <span class="ic"><i class="bi {{ c.icon }}"></i></span>
+          <span class="name">{{ c.label }}</span>
+          <span class="count">{{ c.count }} listing{{ c.count|pluralize }}</span>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% if featured %}
+<section class="section pt-4">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
+      <div><span class="eyebrow"><i class="bi bi-star-fill"></i> Handpicked</span><h2 class="section-title mt-1 mb-0">Featured properties</h2></div>
+      <a href="{% url 'properties:browse' %}" class="btn btn-outline-primary">See all <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="row g-4">
+      {% for p in featured %}<div class="col-md-6 col-lg-4">{% include 'partials/property_card.html' %}</div>{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if areas %}
+<section class="section section-white">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
+      <div><span class="eyebrow">Explore locations</span><h2 class="section-title mt-1 mb-0">Popular areas</h2></div>
+    </div>
+    <div class="row g-3">
+      {% for a in areas %}
+      <div class="col-6 col-lg-3">
+        <a href="{% url 'properties:browse' %}?location={{ a.location|urlencode }}" class="area-card">
+          {% if a.image %}<img src="{{ a.image }}" alt="{{ a.location }}" loading="lazy">{% else %}<img src="{% static 'img/photos/' %}{{ a.fallback }}.jpg" alt="" loading="lazy">{% endif %}
+          <div class="info"><div class="t">{{ a.location }}</div><div class="s">{{ a.city }} · {{ a.n }} propert{{ a.n|pluralize:"y,ies" }}</div></div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
+      <div><span class="eyebrow">Just posted</span><h2 class="section-title mt-1 mb-0">Recently published</h2></div>
+      <a href="{% url 'properties:browse' %}?sort=newest" class="btn btn-outline-primary">View all <i class="bi bi-arrow-right"></i></a>
+    </div>
+    {% if latest %}
+    <div class="row g-4">
+      {% for p in latest %}<div class="col-sm-6 col-lg-3">{% include 'partials/property_card.html' with compact=True %}</div>{% endfor %}
+    </div>
+    {% else %}
+      {% include 'partials/empty.html' with icon='bi-house' title='No listings yet' text='Be the first landlord to post a property on Ghorify.' %}
+    {% endif %}
+  </div>
+</section>
+
+<section class="section section-white">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-4">
+        <span class="eyebrow">Why Ghorify</span>
+        <h2 class="section-title mt-1">Renting made simple and safe</h2>
+        <p class="text-muted">No more calling ten landlords to find out the real cost, or crossing the city for a flat that was rented last week.</p>
+        <a href="{% url 'search:search' %}" class="btn btn-primary mt-2"><i class="bi bi-stars me-1"></i>Find my match</a>
+      </div>
+      <div class="col-lg-8">
+        <div class="row g-4">
+          <div class="col-md-6"><div class="feature"><span class="ic"><i class="bi bi-patch-check"></i></span><div><h6>Verified landlords</h6><p>Landlords upload their NID and an admin checks it before any listing goes live.</p></div></div></div>
+          <div class="col-md-6"><div class="feature"><span class="ic"><i class="bi bi-receipt"></i></span><div><h6>Real monthly cost</h6><p>Rent, service charge, gas, electricity and water added up, so there are no surprises.</p></div></div></div>
+          <div class="col-md-6"><div class="feature"><span class="ic"><i class="bi bi-stars"></i></span><div><h6>Smart match %</h6><p>Tell us your budget, area and needs. Every home gets a match score.</p></div></div></div>
+          <div class="col-md-6"><div class="feature"><span class="ic"><i class="bi bi-calendar-check"></i></span><div><h6>Book visits online</h6><p>Pick a date and time slot. Once the landlord confirms, the contact number unlocks.</p></div></div></div>
+          <div class="col-md-6"><div class="feature"><span class="ic"><i class="bi bi-layout-three-columns"></i></span><div><h6>Compare side by side</h6><p>Put up to three homes next to each other. The best value is highlighted.</p></div></div></div>
+          <div class="col-md-6"><div class="feature"><span class="ic"><i class="bi bi-flag"></i></span><div><h6>Report fake ads</h6><p>Wrong rent or location? Report it and the admin team takes the listing down.</p></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section pb-0">
+  <div class="container">
+    <div class="cta-band" style="--cta-img:url('{% static 'img/photos/landlord_cta.jpg' %}')">
+      <div style="max-width:560px">
+        <span class="hero-badge mb-3"><i class="bi bi-gift"></i> Posting is free</span>
+        <h2 class="mb-2">Have a flat, room or shop to rent out?</h2>
+        <p class="mb-4 opacity-75">Post it in minutes, get verified, and receive visit requests from tenants who match what you offer.</p>
+        <a href="{% if user.is_authenticated and user.is_landlord %}{% url 'properties:create' %}{% else %}{% url 'accounts:register' %}{% endif %}" class="btn btn-accent btn-lg"><i class="bi bi-plus-lg me-1"></i>Post your property</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

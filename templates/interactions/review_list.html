@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load ghorify_tags %}
+{% block title %}My reviews{% endblock %}
+{% block content %}
+<div class="container" style="max-width:900px">
+  <div class="page-header"><span class="eyebrow">Tenant</span><h1>My reviews</h1></div>
+  {% for r in reviews %}
+    <div class="request-card">
+      <div class="d-flex flex-wrap justify-content-between gap-2">
+        <div>
+          <a href="{{ r.property.get_absolute_url }}" class="fw-bold text-reset">{{ r.property.title }}</a>
+          <div class="small"><span class="stars">{{ r.rating|stars }}</span> <span class="text-muted">· {{ r.created_at|date:'d M Y' }}</span></div>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'interactions:review_update' r.pk %}" class="btn btn-sm btn-soft"><i class="bi bi-pencil"></i></a>
+          <form method="post" action="{% url 'interactions:review_delete' r.pk %}" data-confirm="Delete this review?">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}"><button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+        </div>
+      </div>
+      <p class="mb-0 mt-2">{{ r.comment }}</p>
+    </div>
+  {% empty %}
+    {% include 'partials/empty.html' with icon='bi-star' title='No reviews yet' text='After a visit is approved you can rate the home and the landlord.' %}
+  {% endfor %}
+</div>
+{% endblock %}

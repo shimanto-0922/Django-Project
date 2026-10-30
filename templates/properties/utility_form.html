@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Edit bill{% endblock %}
+{% block content %}
+<div class="container" style="max-width:640px">
+  {% include 'properties/_manage_header.html' with tab='bills' %}
+  <div class="gh-card gh-card-body p-4">
+    <div class="gh-card-title"><i class="bi bi-receipt"></i> Edit {{ utility.get_name_display }}</div>
+    <form method="post">{% csrf_token %}
+      {% include 'partials/field.html' with field=form.name %}
+      <div class="row g-2">
+        <div class="col-7">{% include 'partials/field.html' with field=form.amount %}</div>
+        <div class="col-5">{% include 'partials/field.html' with field=form.billing_period %}</div>
+      </div>
+      {% include 'partials/field.html' with field=form.included_in_rent %}
+      {% include 'partials/field.html' with field=form.note %}
+      <div class="d-flex gap-2">
+        <a href="{% url 'properties:utilities' property.pk %}" class="btn btn-soft">Cancel</a>
+        <button class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

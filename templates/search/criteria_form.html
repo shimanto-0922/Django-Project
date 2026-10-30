@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}{% if is_edit %}Edit saved search{% else %}New saved search{% endif %}{% endblock %}
+{% block content %}
+<div class="container" style="max-width:640px">
+  <div class="page-header">
+    <a href="{% url 'search:saved' %}" class="small text-muted"><i class="bi bi-arrow-left"></i> Saved searches</a>
+    <h1 class="mt-2">{% if is_edit %}Edit "{{ criteria.name }}"{% else %}New saved search{% endif %}</h1>
+  </div>
+  <form method="post" class="gh-card gh-card-body p-4" novalidate>{% csrf_token %}
+    {% include 'partials/field.html' with field=form.name %}
+    {% include 'search/_criteria_fields.html' %}
+    <div class="d-flex gap-2 justify-content-end">
+      <a href="{% url 'search:saved' %}" class="btn btn-soft">Cancel</a>
+      <button class="btn btn-primary">{% if is_edit %}Save changes{% else %}Save search{% endif %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

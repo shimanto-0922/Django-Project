@@ -1,0 +1,86 @@
+{% with url=request.resolver_match.url_name ns=request.resolver_match.namespace %}
+<div class="top-strip d-none d-md-block">
+  <div class="container d-flex justify-content-between">
+    <span><i class="bi bi-shield-check me-1"></i> Verified landlords · contact details shared only after approval</span>
+    <span class="d-flex gap-3">
+      <a href="{% url 'properties:browse' %}?category=bachelor">Bachelor</a>
+      <a href="{% url 'properties:browse' %}?category=hostel">Hostel</a>
+      <a href="{% url 'properties:browse' %}?category=office">Office</a>
+      <a href="{% url 'properties:browse' %}?category=shop">Shop</a>
+    </span>
+  </div>
+</div>
+<nav class="navbar navbar-expand-lg gh-nav sticky-top py-2">
+  <div class="container">
+    <a class="navbar-brand gh-brand" href="{% url 'properties:home' %}">
+      <span class="logo"><i class="bi bi-house-door-fill"></i></span><span>Ghor<span class="accent">ify</span></span>
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Menu">
+      <i class="bi bi-list fs-2"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-lg-4 me-auto gap-1 mt-3 mt-lg-0">
+        <li class="nav-item"><a class="nav-link {% if url == 'browse' and not request.GET.category %}active{% endif %}" href="{% url 'properties:browse' %}">All rentals</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.GET.category == 'family' %}active{% endif %}" href="{% url 'properties:browse' %}?category=family">Family</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.GET.category == 'bachelor' %}active{% endif %}" href="{% url 'properties:browse' %}?category=bachelor">Bachelor</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.GET.category == 'sublet' %}active{% endif %}" href="{% url 'properties:browse' %}?category=sublet">Sublet</a></li>
+        <li class="nav-item"><a class="nav-link {% if ns == 'search' and url == 'search' %}active{% endif %}" href="{% url 'search:search' %}"><i class="bi bi-stars me-1"></i>Smart match</a></li>
+        {% if user.is_authenticated and user.is_tenant %}
+          <li class="nav-item"><a class="nav-link {% if url == 'compare' or url == 'comparison' %}active{% endif %}" href="{% url 'interactions:compare' %}">Compare{% if compare_count %}<span class="nav-badge">{{ compare_count }}</span>{% endif %}</a></li>
+        {% elif user.is_authenticated and user.is_landlord %}
+          <li class="nav-item"><a class="nav-link {% if url == 'mine' %}active{% endif %}" href="{% url 'properties:mine' %}">My listings</a></li>
+          <li class="nav-item"><a class="nav-link {% if url == 'incoming' %}active{% endif %}" href="{% url 'interactions:incoming' %}">Requests</a></li>
+        {% elif user.is_authenticated and user.is_platform_admin %}
+          <li class="nav-item"><a class="nav-link {% if url == 'moderation' %}active{% endif %}" href="{% url 'dashboard:moderation' %}">Moderation</a></li>
+        {% endif %}
+      </ul>
+      <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+        {% if user.is_authenticated %}
+          {% if user.is_tenant %}
+            <a href="{% url 'interactions:favourites' %}" class="btn btn-icon btn-soft" title="Saved properties"><i class="bi bi-heart"></i></a>
+          {% endif %}
+          <div class="dropdown">
+            <a href="#" class="d-flex align-items-center gap-2 text-reset" data-bs-toggle="dropdown" aria-expanded="false">
+              {% if user.avatar %}<img src="{{ user.avatar.url }}" class="avatar" alt="">{% else %}<span class="avatar">{{ user.initials }}</span>{% endif %}
+              <span class="d-lg-none fw-semibold">{{ user.display_name }}</span>
+              <i class="bi bi-chevron-down small text-muted"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li class="px-3 py-2"><div class="fw-bold">{{ user.display_name }}</div><div class="small text-muted">{{ user.get_role_display }} account</div></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{% url 'dashboard:home' %}"><i class="bi bi-grid me-2"></i>Dashboard</a></li>
+              {% if user.is_tenant %}
+                <li><a class="dropdown-item" href="{% url 'interactions:favourites' %}"><i class="bi bi-heart me-2"></i>Saved properties</a></li>
+                <li><a class="dropdown-item" href="{% url 'interactions:visits' %}"><i class="bi bi-calendar-check me-2"></i>My visits</a></li>
+                <li><a class="dropdown-item" href="{% url 'interactions:rentals' %}"><i class="bi bi-file-earmark-text me-2"></i>Rental applications</a></li>
+                <li><a class="dropdown-item" href="{% url 'search:saved' %}"><i class="bi bi-bookmark me-2"></i>Saved searches</a></li>
+                <li><a class="dropdown-item" href="{% url 'interactions:reviews' %}"><i class="bi bi-star me-2"></i>My reviews</a></li>
+              {% elif user.is_landlord %}
+                <li><a class="dropdown-item" href="{% url 'properties:mine' %}"><i class="bi bi-houses me-2"></i>My listings</a></li>
+                <li><a class="dropdown-item" href="{% url 'interactions:incoming' %}"><i class="bi bi-inbox me-2"></i>Requests</a></li>
+              {% elif user.is_platform_admin %}
+                <li><a class="dropdown-item" href="{% url 'dashboard:landlords' %}"><i class="bi bi-patch-check me-2"></i>Landlord verification</a></li>
+                <li><a class="dropdown-item" href="{% url 'dashboard:reports' %}"><i class="bi bi-flag me-2"></i>Reports</a></li>
+                <li><a class="dropdown-item" href="{% url 'dashboard:users' %}"><i class="bi bi-people me-2"></i>Users</a></li>
+                {% if user.is_staff %}<li><a class="dropdown-item" href="{% url 'admin:index' %}"><i class="bi bi-gear me-2"></i>Django admin</a></li>{% endif %}
+              {% endif %}
+              <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="bi bi-person me-2"></i>Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}
+                  <button class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i>Log out</button>
+                </form>
+              </li>
+            </ul>
+          </div>
+        {% else %}
+          <a href="{% url 'accounts:login' %}" class="btn btn-sm btn-soft"><i class="bi bi-person me-1"></i>Log in</a>
+        {% endif %}
+        {% if not user.is_authenticated or user.is_landlord %}
+          <a href="{% if user.is_authenticated %}{% url 'properties:create' %}{% else %}{% url 'accounts:register' %}{% endif %}" class="btn btn-sm btn-accent"><i class="bi bi-plus-lg me-1"></i>Post property</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
+{% endwith %}

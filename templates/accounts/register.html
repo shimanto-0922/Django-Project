@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Create account{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card px-3" style="max-width:600px">
+    <div class="gh-card gh-card-body p-4 p-md-5">
+      <div class="text-center mb-4">
+        <span class="eyebrow">Join Ghorify</span>
+        <h2 class="mt-2 mb-1">Create your account</h2>
+        <p class="text-muted small">It takes less than a minute.</p>
+      </div>
+      <form method="post" novalidate>{% csrf_token %}
+        <div class="role-picker mb-4">
+          {% for opt in form.role %}
+            {{ opt.tag }}
+            <label for="{{ opt.id_for_label }}"><i class="bi {% if forloop.first %}bi-search-heart{% else %}bi-house-gear{% endif %}"></i>{{ opt.choice_label }}</label>
+          {% endfor %}
+        </div>
+        {{ form.role.errors }}
+        <div class="row g-3">
+          <div class="col-md-6">{% include 'partials/field.html' with field=form.first_name %}</div>
+          <div class="col-md-6">{% include 'partials/field.html' with field=form.last_name %}</div>
+          <div class="col-md-6">{% include 'partials/field.html' with field=form.username %}</div>
+          <div class="col-md-6">{% include 'partials/field.html' with field=form.phone %}</div>
+        </div>
+        {% include 'partials/field.html' with field=form.email %}
+        <div class="row g-3">
+          <div class="col-md-6">{% include 'partials/field.html' with field=form.password1 %}</div>
+          <div class="col-md-6">{% include 'partials/field.html' with field=form.password2 %}</div>
+        </div>
+        <button class="btn btn-primary btn-lg w-100 mt-2">Create account</button>
+      </form>
+      <p class="text-center small mt-4 mb-0">Already have an account? <a href="{% url 'accounts:login' %}" class="fw-bold">Log in</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'dashboard/_admin_base.html' %}
+{% block title %}Reports{% endblock %}
+{% block admin_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <h1 class="mb-0" style="font-size:2rem">Reported listings</h1>
+  <div class="btn-group">{% for key, label in status_choices %}<a href="?status={{ key }}" class="btn btn-sm {% if status == key %}btn-dark{% else %}btn-soft{% endif %}">{{ label }}</a>{% endfor %}</div>
+</div>
+{% for r in reports %}
+<div class="request-card">
+  <div class="d-flex flex-wrap gap-3 align-items-start">
+    <div class="mini-thumb" style="background:#fbe4e4;color:#c23b3b"><i class="bi bi-flag-fill"></i></div>
+    <div class="flex-grow-1">
+      <div class="fw-bold">{{ r.get_reason_display }}</div>
+      <div class="small">on <a href="{{ r.property.get_absolute_url }}" target="_blank">{{ r.property.title }}</a> · by {{ r.reporter.display_name }} · {{ r.created_at|timesince }} ago</div>
+      {% if r.details %}<p class="small mb-0 mt-2">"{{ r.details }}"</p>{% endif %}
+      {% if r.admin_note %}<div class="small text-muted mt-1">Admin note: {{ r.admin_note }}{% if r.handled_by %} ({{ r.handled_by }}){% endif %}</div>{% endif %}
+    </div>
+    <span class="status status-{{ r.status }}">{{ r.get_status_display }}</span>
+  </div>
+  {% if r.status == 'open' %}
+  <form method="post" action="{% url 'dashboard:handle_report' r.pk %}" class="d-flex flex-wrap gap-2 mt-3">{% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <input name="note" class="form-control form-control-sm flex-grow-1" style="max-width:420px" placeholder="Admin note">
+    <button name="action" value="unpublish" class="btn btn-sm btn-danger" onclick="return confirm('Unpublish this listing?')"><i class="bi bi-eye-slash me-1"></i>Unpublish listing</button>
+    <button name="action" value="dismiss" class="btn btn-sm btn-soft">Dismiss</button>
+  </form>
+  {% endif %}
+</div>
+{% empty %}
+  {% include 'partials/empty.html' with icon='bi-shield-check' title='All clear' text='No reports with this status.' %}
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,25 @@
+{% load ghorify_tags %}{% with kind=field|widget_kind %}
+<div class="{{ wrapper|default:'mb-3' }}">
+  {% if kind == 'switch' %}
+    <div class="form-check form-switch">
+      {{ field|bs }}
+      <label class="form-check-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    </div>
+  {% elif kind == 'multi' %}
+    <label class="form-label">{{ field.label }}</label>
+    <div class="check-grid">
+      {% for opt in field %}<div class="check-pill">{{ opt.tag }}<label for="{{ opt.id_for_label }}">{{ opt.choice_label }}</label></div>{% endfor %}
+    </div>
+  {% elif kind == 'radio' %}
+    <label class="form-label d-block">{{ field.label }}</label>
+    <div class="d-flex flex-wrap gap-2">
+      {% for opt in field %}<div class="check-pill">{{ opt.tag }}<label for="{{ opt.id_for_label }}">{{ opt.choice_label }}</label></div>{% endfor %}
+    </div>
+  {% else %}
+    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+    {{ field|bs }}
+  {% endif %}
+  {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+  {{ field.errors }}
+</div>
+{% endwith %}

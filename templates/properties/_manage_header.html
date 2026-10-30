@@ -1,0 +1,10 @@
+<div class="page-header">
+  <a href="{% url 'properties:mine' %}" class="small text-muted"><i class="bi bi-arrow-left"></i> My listings</a>
+  <h1 class="mt-2">{{ property.title }}</h1>
+  <ul class="nav nav-pills-gh gap-1 mt-3">
+    <li><a class="nav-link" href="{% url 'properties:update' property.pk %}"><i class="bi bi-pencil me-1"></i>Details</a></li>
+    <li><a class="nav-link {% if tab == 'photos' %}active{% endif %}" href="{% url 'properties:images' property.pk %}"><i class="bi bi-images me-1"></i>Photos</a></li>
+    <li><a class="nav-link {% if tab == 'bills' %}active{% endif %}" href="{% url 'properties:utilities' property.pk %}"><i class="bi bi-receipt me-1"></i>Bills &amp; utilities</a></li>
+    <li><a class="nav-link" href="{{ property.get_absolute_url }}"><i class="bi bi-eye me-1"></i>Preview</a></li>
+  </ul>
+</div>

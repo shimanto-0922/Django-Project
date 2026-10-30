@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Delete listing{% endblock %}
+{% block content %}
+<div class="container" style="max-width:560px">
+  <div class="gh-card gh-card-body p-5 text-center mt-5">
+    <div class="empty-state p-0">
+      <div class="ic" style="background:#fbe4e4;color:#c23b3b"><i class="bi bi-trash3"></i></div>
+    </div>
+    <h3>Delete "{{ property.title }}"?</h3>
+    <p class="text-muted">This removes the listing, its {{ property.images.count }} photo{{ property.images.count|pluralize }}, bills, reviews and all visit/rental requests. This cannot be undone.</p>
+    <form method="post" class="d-flex gap-2 justify-content-center mt-4">{% csrf_token %}
+      <a href="{% url 'properties:mine' %}" class="btn btn-soft">Keep it</a>
+      <button class="btn btn-danger">Yes, delete</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

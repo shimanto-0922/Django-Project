@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Photos · {{ property.title }}{% endblock %}
+{% block content %}
+<div class="container">
+  {% include 'properties/_manage_header.html' with tab='photos' %}
+  <div class="row g-4">
+    <div class="col-lg-8">
+      {% if images %}
+      <div class="row g-3">
+        {% for img in images %}
+        <div class="col-sm-6 col-xl-4">
+          <div class="gh-card overflow-hidden h-100">
+            <div class="position-relative" style="aspect-ratio:4/3">
+              <img src="{{ img.image.url }}" class="w-100 h-100" style="object-fit:cover" alt="">
+              {% if img.is_primary %}<span class="chip position-absolute top-0 start-0 m-2"><i class="bi bi-star-fill text-warning"></i> Cover</span>{% endif %}
+            </div>
+            <div class="p-3">
+              <div class="small text-muted mb-2 text-truncate">{{ img.caption|default:'No caption' }}</div>
+              <div class="d-flex gap-1">
+                {% if not img.is_primary %}
+                <form method="post" action="{% url 'properties:image_primary' property.pk img.pk %}">{% csrf_token %}<button class="btn btn-sm btn-soft" title="Make cover"><i class="bi bi-star"></i></button></form>
+                {% endif %}
+                <a href="{% url 'properties:image_update' property.pk img.pk %}" class="btn btn-sm btn-soft" title="Edit"><i class="bi bi-pencil"></i></a>
+                <form method="post" action="{% url 'properties:image_delete' property.pk img.pk %}" data-confirm="Delete this photo?" class="ms-auto">{% csrf_token %}<button class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button></form>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+        {% include 'partials/empty.html' with icon='bi-images' title='No photos yet' text='Listings with photos get far more visit requests.' %}
+      {% endif %}
+    </div>
+    <div class="col-lg-4">
+      <div class="gh-card gh-card-body sticky-side">
+        <div class="gh-card-title"><i class="bi bi-cloud-arrow-up"></i> Upload a photo</div>
+        <form method="post" enctype="multipart/form-data">{% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label" for="id_image">Image <span class="text-danger">*</span></label>
+            <input type="file" name="image" id="id_image" class="form-control" accept="image/*" required data-preview="#onePreview">
+            {{ form.image.errors }}
+            <div id="onePreview" class="mt-2"></div>
+          </div>
+          {% include 'partials/field.html' with field=form.caption %}
+          {% include 'partials/field.html' with field=form.is_primary %}
+          <button class="btn btn-primary w-100">Upload</button>
+        </form>
+        <p class="small text-muted mt-3 mb-0">{{ images|length }}/10 photos · max 5 MB each</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

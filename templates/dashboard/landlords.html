@@ -1,0 +1,32 @@
+{% extends 'dashboard/_admin_base.html' %}
+{% block title %}Landlord verification{% endblock %}
+{% block admin_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <h1 class="mb-0" style="font-size:2rem">Landlord verification</h1>
+  <div class="btn-group flex-wrap">{% for key, label in status_choices %}<a href="?status={{ key }}" class="btn btn-sm {% if status == key %}btn-dark{% else %}btn-soft{% endif %}">{{ label }}</a>{% endfor %}</div>
+</div>
+{% for lp in profiles %}
+<div class="request-card">
+  <div class="d-flex flex-wrap gap-3 align-items-center">
+    <span class="avatar" style="width:52px;height:52px">{{ lp.user.initials }}</span>
+    <div class="flex-grow-1">
+      <div class="fw-bold">{{ lp.user.display_name }} <span class="text-muted fw-normal small">@{{ lp.user.username }}</span></div>
+      <div class="small text-muted">{{ lp.user.email }} · {{ lp.user.phone|default:'no phone' }} · NID {{ lp.nid_number|default:'-' }} · {{ lp.listings }} listing{{ lp.listings|pluralize }}</div>
+      {% if lp.verification_docs %}<a href="{{ lp.verification_docs.url }}" target="_blank" class="small fw-semibold"><i class="bi bi-file-earmark-text"></i> View document</a>{% else %}<span class="small text-muted">No document uploaded</span>{% endif %}
+      {% if lp.verified_by %}<div class="small text-muted">Reviewed by {{ lp.verified_by }}{% if lp.verified_at %} on {{ lp.verified_at|date:'d M Y' }}{% endif %}</div>{% endif %}
+    </div>
+    <span class="status status-{{ lp.status }}">{{ lp.get_status_display }}</span>
+  </div>
+  {% if lp.status != 'verified' %}
+  <form method="post" action="{% url 'dashboard:verify_landlord' lp.pk %}" class="d-flex flex-wrap gap-2 mt-3">{% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <input name="note" class="form-control form-control-sm flex-grow-1" style="max-width:420px" placeholder="Note if rejecting, e.g. document is blurry">
+    <button name="decision" value="approve" class="btn btn-sm btn-primary" {% if not lp.verification_docs %}disabled{% endif %}><i class="bi bi-patch-check me-1"></i>Verify</button>
+    <button name="decision" value="reject" class="btn btn-sm btn-outline-danger">Reject</button>
+  </form>
+  {% endif %}
+</div>
+{% empty %}
+  {% include 'partials/empty.html' with icon='bi-person-check' title='No landlords here' text='Nobody with this status.' %}
+{% endfor %}
+{% endblock %}
