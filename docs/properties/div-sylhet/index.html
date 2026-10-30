@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Properties for rent · Ghorify</title>
+  <meta name="description" content="Ghorify — find flats, rooms, sublets, hostels, offices and shops for rent across Bangladesh.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="/Django-Project/static/css/ghorify.css" rel="stylesheet">
+  <link rel="icon" href="/Django-Project/static/img/favicon.svg" type="image/svg+xml">
+  
+</head>
+<body><div style="background:#f97316;color:#fff;text-align:center;font:600 13px/1.4 system-ui;padding:7px 12px">Preview version: you can browse listings here. Login, search, booking and the dashboards work in the full Django app. <a href="/Django-Project/preview.html" style="color:#fff;text-decoration:underline">How to run it</a></div>
+  
+<div class="top-strip d-none d-md-block">
+  <div class="container d-flex justify-content-between">
+    <span><i class="bi bi-shield-check me-1"></i> Verified landlords · contact details shared only after approval</span>
+    <span class="d-flex gap-3">
+      <a href="/Django-Project/properties/cat-bachelor/">Bachelor</a>
+      <a href="/Django-Project/properties/cat-hostel/">Hostel</a>
+      <a href="/Django-Project/properties/cat-office/">Office</a>
+      <a href="/Django-Project/properties/cat-shop/">Shop</a>
+    </span>
+  </div>
+</div>
+<nav class="navbar navbar-expand-lg gh-nav sticky-top py-2">
+  <div class="container">
+    <a class="navbar-brand gh-brand" href="/Django-Project/">
+      <span class="logo"><i class="bi bi-house-door-fill"></i></span><span>Ghor<span class="accent">ify</span></span>
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Menu">
+      <i class="bi bi-list fs-2"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-lg-4 me-auto gap-1 mt-3 mt-lg-0">
+        <li class="nav-item"><a class="nav-link active" href="/Django-Project/properties/">All rentals</a></li>
+        <li class="nav-item"><a class="nav-link " href="/Django-Project/properties/cat-family/">Family</a></li>
+        <li class="nav-item"><a class="nav-link " href="/Django-Project/properties/cat-bachelor/">Bachelor</a></li>
+        <li class="nav-item"><a class="nav-link " href="/Django-Project/properties/cat-sublet/">Sublet</a></li>
+        <li class="nav-item"><a class="nav-link " href="/Django-Project/preview.html"><i class="bi bi-stars me-1"></i>Smart match</a></li>
+        
+      </ul>
+      <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+        
+          <a href="/Django-Project/preview.html" class="btn btn-sm btn-soft"><i class="bi bi-person me-1"></i>Log in</a>
+        
+        
+          <a href="/Django-Project/preview.html" class="btn btn-sm btn-accent"><i class="bi bi-plus-lg me-1"></i>Post property</a>
+        
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+
+  
+
+  <main>
+<div class="bg-white border-bottom">
+  <div class="container page-header">
+    <div class="breadcrumb-gh mb-1"><a href="/Django-Project/">Home</a><i class="bi bi-chevron-right small"></i><span>All rentals</span></div>
+    <h1>Properties for rent</h1>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="row g-4">
+    <aside class="col-lg-3">
+      <button class="btn btn-soft w-100 d-lg-none mb-2" data-bs-toggle="collapse" data-bs-target="#filters"><i class="bi bi-sliders me-1"></i>Filters</button>
+      <form method="get" id="filters" class="collapse d-lg-block">
+        <div class="gh-card gh-card-body filter-box">
+          <div class="filter-group">
+            <div class="filter-title">Category</div>
+            <div class="cat-list">
+              <a href="/Django-Project/properties/" class="active"><span><i class="bi bi-grid"></i>All</span></a>
+              
+                <a href="/Django-Project/properties/cat-family/" class=""><span><i class="bi bi-house-heart"></i>Family</span><span class="c">7</span></a>
+              
+                <a href="/Django-Project/properties/cat-bachelor/" class=""><span><i class="bi bi-person-badge"></i>Bachelor</span><span class="c">2</span></a>
+              
+                <a href="/Django-Project/properties/cat-sublet/" class=""><span><i class="bi bi-door-open"></i>Sublet</span><span class="c">1</span></a>
+              
+                <a href="/Django-Project/properties/cat-hostel/" class=""><span><i class="bi bi-buildings"></i>Hostel / Mess</span><span class="c">2</span></a>
+              
+                <a href="/Django-Project/properties/cat-office/" class=""><span><i class="bi bi-briefcase"></i>Office</span><span class="c">1</span></a>
+              
+                <a href="/Django-Project/properties/cat-shop/" class=""><span><i class="bi bi-shop"></i>Shop</span><span class="c">1</span></a>
+              
+            </div>
+            <input type="hidden" name="category" value="">
+          </div>
+          <div class="filter-group">
+            <div class="filter-title">Location</div>
+            <div class="mb-2"><select name="division" class="form-select" id="id_division">
+  <option value="">All divisions</option>
+
+  <option value="dhaka">Dhaka</option>
+
+  <option value="chattogram">Chattogram</option>
+
+  <option value="khulna">Khulna</option>
+
+  <option value="rajshahi">Rajshahi</option>
+
+  <option value="sylhet" selected>Sylhet</option>
+
+  <option value="barishal">Barishal</option>
+
+  <option value="rangpur">Rangpur</option>
+
+  <option value="mymensingh">Mymensingh</option>
+
+</select></div>
+            <input type="text" name="location" placeholder="e.g. Dhanmondi" list="area-list" autocomplete="off" class="form-control" id="id_location">
+            <datalist id="area-list"><option value="Dhanmondi"><option value="Gulshan"><option value="Banani"><option value="Uttara"><option value="Mirpur"><option value="Mohammadpur"><option value="Bashundhara"><option value="Farmgate"><option value="Tejgaon"><option value="Badda"><option value="Rampura"><option value="Khilgaon"><option value="Motijheel"><option value="Shantinagar"><option value="Malibagh"><option value="Baridhara"><option value="Lalmatia"><option value="Shyamoli"><option value="Agargaon"><option value="Wari"><option value="Old Dhaka"><option value="Agrabad"><option value="Nasirabad"><option value="Khulshi"><option value="Zindabazar"><option value="Ambarkhana"><option value="Sonadanga"><option value="Shaheb Bazar"></datalist>
+          </div>
+          <div class="filter-group">
+            <div class="filter-title">Rent per month (৳)</div>
+            <div class="row g-2"><div class="col-6"><input type="number" name="min_price" placeholder="Min" min="0" class="form-control" id="id_min_price"></div><div class="col-6"><input type="number" name="max_price" placeholder="Max" min="0" class="form-control" id="id_max_price"></div></div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-title">Rooms</div>
+            <div class="row g-2">
+              <div class="col-6"><label class="form-label small mb-1">Min beds</label><input type="number" name="bedrooms" placeholder="Any" min="0" class="form-control" id="id_bedrooms"></div>
+              <div class="col-6"><label class="form-label small mb-1">Min baths</label><input type="number" name="bathrooms" placeholder="Any" min="0" class="form-control" id="id_bathrooms"></div>
+            </div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-title">Property type</div>
+            <select name="property_type" class="form-select" id="id_property_type">
+  <option value="" selected>Any type</option>
+
+  <option value="apartment">Apartment / Flat</option>
+
+  <option value="house">Full house</option>
+
+  <option value="room">Single room</option>
+
+  <option value="studio">Studio</option>
+
+  <option value="duplex">Duplex</option>
+
+  <option value="seat">Seat (shared room)</option>
+
+  <option value="commercial">Commercial space</option>
+
+</select>
+          </div>
+          <div class="filter-group">
+            <div class="filter-title">Rent to</div>
+            <select name="gender" class="form-select" id="id_gender">
+  <option value="" selected>Anyone</option>
+
+  <option value="male">Male</option>
+
+  <option value="female">Female</option>
+
+</select>
+          </div>
+          <div class="filter-group">
+            <div class="filter-title">More</div>
+            
+              <div class="form-check mb-1"><input type="checkbox" name="negotiable" class="form-check-input" id="id_negotiable"><label class="form-check-label small fw-semibold" for="id_negotiable">Negotiable rent</label></div>
+            
+              <div class="form-check mb-1"><input type="checkbox" name="furnished" class="form-check-input" id="id_furnished"><label class="form-check-label small fw-semibold" for="id_furnished">Furnished</label></div>
+            
+              <div class="form-check mb-1"><input type="checkbox" name="parking" class="form-check-input" id="id_parking"><label class="form-check-label small fw-semibold" for="id_parking">Parking</label></div>
+            
+              <div class="form-check mb-1"><input type="checkbox" name="verified" class="form-check-input" id="id_verified"><label class="form-check-label small fw-semibold" for="id_verified">Verified landlord</label></div>
+            
+          </div>
+          <input type="hidden" name="sort" value="">
+          <button class="btn btn-primary w-100 mt-2"><i class="bi bi-funnel me-1"></i>Apply filters</button>
+          <a href="/Django-Project/properties/" class="btn btn-link btn-sm w-100 text-muted mt-1">Clear all</a>
+        </div>
+      </form>
+    </aside>
+
+    <section class="col-lg-9">
+      <div class="results-bar">
+        <div>
+          <strong>1</strong> property found
+          
+        </div>
+        <form method="get" class="d-flex align-items-center gap-2">
+          <input type="hidden" name="division" value="sylhet">
+          <label class="small text-muted text-nowrap" for="sortSel">Sort by</label>
+          <select name="sort" id="sortSel" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="recommended" >Featured first</option><option value="newest" >Newest first</option><option value="price_low" >Rent: low to high</option><option value="price_high" >Rent: high to low</option><option value="rating" >Best rated</option>
+          </select>
+        </form>
+      </div>
+
+      
+        <div class="row g-4">
+          <div class="col-md-6 col-xl-4">
+<article class="property-card">
+  <div class="thumb">
+    <a href="/Django-Project/properties/28/">
+      
+        <img src="/Django-Project/media/properties/28/room_3.jpg" alt="Bachelor room near Zindabazar" loading="lazy">
+      
+    </a>
+    <div class="chips">
+      
+      <span class="chip"><i class="bi bi-person-badge"></i>Bachelor</span>
+      
+      
+    </div>
+    
+    <span class="chip chip-dark photo-count"><i class="bi bi-camera"></i>3</span>
+  </div>
+  <div class="body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+      <div class="price">৳ 7,000 <small>/month</small></div>
+      <span class="tag tag-nego">Negotiable</span>
+    </div>
+    <a href="/Django-Project/properties/28/" class="title mt-1">Bachelor room near Zindabazar</a>
+    <div class="loc mt-1"><i class="bi bi-geo-alt"></i> Zindabazar, Sylhet</div>
+    <div class="specs">
+      
+        <span><i class="bi bi-door-closed"></i>1 Bed</span>
+        <span><i class="bi bi-droplet"></i>1 Bath</span>
+        <span><i class="bi bi-flower1"></i>1 Balcony</span>
+        <span><i class="bi bi-arrows-angle-expand"></i>180 ft²</span>
+      
+    </div>
+    <div class="foot">
+      <span>
+        <span class="tag tag-male"><i class="bi bi-gender-male"></i>Male only</span>
+        
+      </span>
+      <span>today</span>
+    </div>
+  </div>
+</article>
+</div>
+        </div>
+        
+
+
+      
+
+      <div class="gh-card gh-card-body mt-4 d-flex flex-wrap align-items-center gap-3" style="background:var(--gh-soft);border-color:var(--gh-soft-2)">
+        <i class="bi bi-stars fs-2" style="color:var(--gh-primary)"></i>
+        <div class="flex-grow-1"><div class="fw-bold">Not sure what fits best?</div><div class="small text-muted">Smart match scores every home against your budget, area and needs.</div></div>
+        <a href="/Django-Project/preview.html" class="btn btn-primary">Try Smart match</a>
+      </div>
+    </section>
+  </div>
+</div>
+</main>
+
+  <footer class="gh-footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <a class="gh-brand mb-3" href="/Django-Project/"><span class="logo"><i class="bi bi-house-door-fill"></i></span><span>Ghor<span class="accent">ify</span></span></a>
+        <p class="mb-3">Flats, rooms, sublets, hostel seats, offices and shops for rent across Bangladesh. Verified landlords, clear monthly costs, easy visit booking.</p>
+        <div class="d-flex gap-2">
+          <span class="btn btn-icon btn-sm" style="background:rgba(255,255,255,.08);color:#fff"><i class="bi bi-facebook"></i></span>
+          <span class="btn btn-icon btn-sm" style="background:rgba(255,255,255,.08);color:#fff"><i class="bi bi-instagram"></i></span>
+          <span class="btn btn-icon btn-sm" style="background:rgba(255,255,255,.08);color:#fff"><i class="bi bi-youtube"></i></span>
+        </div>
+      </div>
+      <div class="col-6 col-lg-2 offset-lg-1">
+        <h6 class="mb-3">Rent by type</h6>
+        <ul class="list-unstyled d-grid gap-2">
+          <li><a href="/Django-Project/properties/cat-family/">Family flats</a></li>
+          <li><a href="/Django-Project/properties/cat-bachelor/">Bachelor</a></li>
+          <li><a href="/Django-Project/properties/cat-sublet/">Sublet</a></li>
+          <li><a href="/Django-Project/properties/cat-hostel/">Hostel / Mess</a></li>
+          <li><a href="/Django-Project/properties/cat-office/">Office</a></li>
+          <li><a href="/Django-Project/properties/cat-shop/">Shop</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h6 class="mb-3">Divisions</h6>
+        <ul class="list-unstyled d-grid gap-2">
+          <li><a href="/Django-Project/properties/div-dhaka/">Dhaka</a></li>
+          <li><a href="/Django-Project/properties/div-chattogram/">Chattogram</a></li>
+          <li><a href="/Django-Project/properties/div-sylhet/">Sylhet</a></li>
+          <li><a href="/Django-Project/properties/div-khulna/">Khulna</a></li>
+          <li><a href="/Django-Project/properties/div-rajshahi/">Rajshahi</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-3">
+        <h6 class="mb-3">For landlords</h6>
+        <ul class="list-unstyled d-grid gap-2">
+          <li><a href="/Django-Project/preview.html">Post a property</a></li>
+          <li><a href="/Django-Project/preview.html">Landlord dashboard</a></li>
+          <li><i class="bi bi-patch-check me-1"></i>Get verified with your NID</li>
+          <li><i class="bi bi-flag me-1"></i>Misleading ads are removed</li>
+        </ul>
+      </div>
+    </div>
+    <hr class="my-4" style="border-color:rgba(255,255,255,.12)">
+    <div class="d-flex flex-wrap justify-content-between small gap-2">
+      <span>&copy; 2026 Ghorify · CSE 302 Project, University of Asia Pacific</span>
+      <span>Photos: Unsplash</span>
+    </div>
+  </div>
+</footer>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/Django-Project/static/js/ghorify.js"></script>
+  
+</body>
+</html>

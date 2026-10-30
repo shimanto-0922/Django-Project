@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flats, rooms &amp; sublets for rent · Ghorify</title>
+  <meta name="description" content="Ghorify — find flats, rooms, sublets, hostels, offices and shops for rent across Bangladesh.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="/Django-Project/static/css/ghorify.css" rel="stylesheet">
+  <link rel="icon" href="/Django-Project/static/img/favicon.svg" type="image/svg+xml">
+  
+</head>
+<body><div style="background:#f97316;color:#fff;text-align:center;font:600 13px/1.4 system-ui;padding:7px 12px">Preview version: you can browse listings here. Login, search, booking and the dashboards work in the full Django app. <a href="/Django-Project/preview.html" style="color:#fff;text-decoration:underline">How to run it</a></div>
+  
+<div class="top-strip d-none d-md-block">
+  <div class="container d-flex justify-content-between">
+    <span><i class="bi bi-shield-check me-1"></i> Verified landlords · contact details shared only after approval</span>
+    <span class="d-flex gap-3">
+      <a href="/Django-Project/properties/cat-bachelor/">Bachelor</a>
+      <a href="/Django-Project/properties/cat-hostel/">Hostel</a>
+      <a href="/Django-Project/properties/cat-office/">Office</a>
+      <a href="/Django-Project/properties/cat-shop/">Shop</a>
+    </span>
+  </div>
+</div>
+<nav class="navbar navbar-expand-lg gh-nav sticky-top py-2">
+  <div class="container">
+    <a class="navbar-brand gh-brand" href="/Django-Project/">
+      <span class="logo"><i class="bi bi-house-door-fill"></i></span><span>Ghor<span class="accent">ify</span></span>
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Menu">
+      <i class="bi bi-list fs-2"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-lg-4 me-auto gap-1 mt-3 mt-lg-0">
+        <li class="nav-item"><a class="nav-link " href="/Django-Project/properties/">All rentals</a></li>
+        <li class="nav-item"><a class="nav-link " href="/Django-Project/properties/cat-family/">Family</a></li>
+        <li class="nav-item"><a class="nav-link " href="/Django-Project/properties/cat-bachelor/">Bachelor</a></li>
+        <li class="nav-item"><a class="nav-link " href="/Django-Project/properties/cat-sublet/">Sublet</a></li>
+        <li class="nav-item"><a class="nav-link " href="/Django-Project/preview.html"><i class="bi bi-stars me-1"></i>Smart match</a></li>
+        
+      </ul>
+      <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+        
+          <a href="/Django-Project/preview.html" class="btn btn-sm btn-soft"><i class="bi bi-person me-1"></i>Log in</a>
+        
+        
+          <a href="/Django-Project/preview.html" class="btn btn-sm btn-accent"><i class="bi bi-plus-lg me-1"></i>Post property</a>
+        
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+
+  
+
+  <main>
+<section class="hero" style="--hero-img:url('/Django-Project/static/img/photos/hero.jpg')">
+  <div class="container">
+    <span class="hero-badge mb-3"><i class="bi bi-patch-check-fill"></i> Every landlord is verified with NID</span>
+    <h1 class="mb-3">Find your next <span>home for rent</span> in Bangladesh</h1>
+    <p class="lead mb-4">Family flats, bachelor rooms, sublets, hostel seats, offices and shops. See the real monthly cost, compare homes and book a visit online.</p>
+
+    <form action="/Django-Project/properties/" method="get" class="search-panel">
+      <div class="search-tabs">
+        <input type="radio" name="category" id="t-all" value="" checked><label for="t-all"><i class="bi bi-grid"></i>All</label>
+        
+          <input type="radio" name="category" id="t-family" value="family"><label for="t-family"><i class="bi bi-house-heart"></i>Family</label>
+        
+          <input type="radio" name="category" id="t-bachelor" value="bachelor"><label for="t-bachelor"><i class="bi bi-person-badge"></i>Bachelor</label>
+        
+          <input type="radio" name="category" id="t-sublet" value="sublet"><label for="t-sublet"><i class="bi bi-door-open"></i>Sublet</label>
+        
+          <input type="radio" name="category" id="t-hostel" value="hostel"><label for="t-hostel"><i class="bi bi-buildings"></i>Hostel / Mess</label>
+        
+          <input type="radio" name="category" id="t-office" value="office"><label for="t-office"><i class="bi bi-briefcase"></i>Office</label>
+        
+          <input type="radio" name="category" id="t-shop" value="shop"><label for="t-shop"><i class="bi bi-shop"></i>Shop</label>
+        
+      </div>
+      <div class="search-fields">
+        <div class="sf">
+          <label for="h-loc">Location</label>
+          <input id="h-loc" name="location" class="form-control" placeholder="Area or city, e.g. Dhanmondi" list="area-list" autocomplete="off">
+          <datalist id="area-list"><option value="Dhanmondi"><option value="Gulshan"><option value="Banani"><option value="Uttara"><option value="Mirpur"><option value="Mohammadpur"><option value="Bashundhara"><option value="Farmgate"><option value="Tejgaon"><option value="Badda"><option value="Rampura"><option value="Khilgaon"><option value="Motijheel"><option value="Shantinagar"><option value="Malibagh"><option value="Baridhara"><option value="Lalmatia"><option value="Shyamoli"><option value="Agargaon"><option value="Wari"><option value="Old Dhaka"><option value="Agrabad"><option value="Nasirabad"><option value="Khulshi"><option value="Zindabazar"><option value="Ambarkhana"><option value="Sonadanga"><option value="Shaheb Bazar"></datalist>
+        </div>
+        <div class="sf">
+          <label for="h-type">Property type</label>
+          <select id="h-type" name="property_type" class="form-select">
+            <option value="">Any type</option>
+            <option value="apartment">Apartment / Flat</option><option value="room">Single room</option>
+            <option value="seat">Seat</option><option value="house">Full house</option>
+            <option value="studio">Studio</option><option value="commercial">Commercial space</option>
+          </select>
+        </div>
+        <div class="sf">
+          <label for="h-max">Max rent (৳)</label>
+          <select id="h-max" name="max_price" class="form-select">
+            <option value="">No limit</option>
+            <option value="5000">5,000</option><option value="10000">10,000</option><option value="15000">15,000</option>
+            <option value="20000">20,000</option><option value="30000">30,000</option><option value="50000">50,000</option>
+            <option value="80000">80,000</option><option value="150000">1,50,000</option>
+          </select>
+        </div>
+        <button class="btn btn-accent btn-lg"><i class="bi bi-search me-1"></i> Search</button>
+      </div>
+    </form>
+
+    <div class="hero-stats">
+      <div><div class="n">14</div><div class="l">Verified listings</div></div>
+      <div><div class="n">13</div><div class="l">Areas covered</div></div>
+      <div><div class="n">2</div><div class="l">Trusted landlords</div></div>
+      <div><a href="/Django-Project/preview.html" class="text-white fw-bold"><i class="bi bi-stars"></i> Try Smart match <i class="bi bi-arrow-right"></i></a><div class="l">Homes ranked by your needs</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section pb-4">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h2 class="section-title mb-0">What are you looking for?</h2>
+      <p class="section-sub">Browse rentals by category</p>
+    </div>
+    <div class="row g-3">
+      
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="/Django-Project/properties/cat-family/" class="category-tile">
+          <span class="ic"><i class="bi bi-house-heart"></i></span>
+          <span class="name">Family</span>
+          <span class="count">7 listings</span>
+        </a>
+      </div>
+      
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="/Django-Project/properties/cat-bachelor/" class="category-tile">
+          <span class="ic"><i class="bi bi-person-badge"></i></span>
+          <span class="name">Bachelor</span>
+          <span class="count">2 listings</span>
+        </a>
+      </div>
+      
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="/Django-Project/properties/cat-sublet/" class="category-tile">
+          <span class="ic"><i class="bi bi-door-open"></i></span>
+          <span class="name">Sublet</span>
+          <span class="count">1 listing</span>
+        </a>
+      </div>
+      
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="/Django-Project/properties/cat-hostel/" class="category-tile">
+          <span class="ic"><i class="bi bi-buildings"></i></span>
+          <span class="name">Hostel / Mess</span>
+          <span class="count">2 listings</span>
+        </a>
+      </div>
+      
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="/Django-Project/properties/cat-office/" class="category-tile">
+          <span class="ic"><i class="bi bi-briefcase"></i></span>
+          <span class="name">Office</span>
+          <span class="count">1 listing</span>
+        </a>
+      </div>
+      
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="/Django-Project/properties/cat-shop/" class="category-tile">
+          <span class="ic"><i class="bi bi-shop"></i></span>
+          <span class="name">Shop</span>
+          <span class="count">1 listing</span>
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+
+<section class="section pt-4">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
+      <div><span class="eyebrow"><i class="bi bi-star-fill"></i> Handpicked</span><h2 class="section-title mt-1 mb-0">Featured properties</h2></div>
+      <a href="/Django-Project/properties/" class="btn btn-outline-primary">See all <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4">
+<article class="property-card">
+  <div class="thumb">
+    <a href="/Django-Project/properties/26/">
+      
+        <img src="/Django-Project/media/properties/26/building_4.jpg" alt="Family flat near GEC Circle" loading="lazy">
+      
+    </a>
+    <div class="chips">
+      <span class="chip chip-featured"><i class="bi bi-star-fill"></i>Featured</span>
+      <span class="chip"><i class="bi bi-house-heart"></i>Family</span>
+      
+      
+    </div>
+    
+    <span class="chip chip-dark photo-count"><i class="bi bi-camera"></i>4</span>
+  </div>
+  <div class="body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+      <div class="price">৳ 25,000 <small>/month</small></div>
+      <span class="tag tag-nego">Negotiable</span>
+    </div>
+    <a href="/Django-Project/properties/26/" class="title mt-1">Family flat near GEC Circle</a>
+    <div class="loc mt-1"><i class="bi bi-geo-alt"></i> Nasirabad, Chattogram</div>
+    <div class="specs">
+      
+        <span><i class="bi bi-door-closed"></i>3 Bed</span>
+        <span><i class="bi bi-droplet"></i>2 Bath</span>
+        <span><i class="bi bi-flower1"></i>2 Balcony</span>
+        <span><i class="bi bi-arrows-angle-expand"></i>1,300 ft²</span>
+      
+    </div>
+    <div class="foot">
+      <span>
+        <span class="tag-verified fw-bold"><i class="bi bi-patch-check-fill"></i> Verified</span>
+        
+      </span>
+      <span>today</span>
+    </div>
+  </div>
+</article>
+</div><div class="col-md-6 col-lg-4">
+<article class="property-card">
+  <div class="thumb">
+    <a href="/Django-Project/properties/23/">
+      
+        <img src="/Django-Project/media/properties/23/office_1.jpg" alt="Office floor on main road, 1800 sqft" loading="lazy">
+      
+    </a>
+    <div class="chips">
+      <span class="chip chip-featured"><i class="bi bi-star-fill"></i>Featured</span>
+      <span class="chip"><i class="bi bi-briefcase"></i>Office</span>
+      
+      
+    </div>
+    
+    <span class="chip chip-dark photo-count"><i class="bi bi-camera"></i>3</span>
+  </div>
+  <div class="body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+      <div class="price">৳ 120,000 <small>/month</small></div>
+      <span class="tag tag-nego">Negotiable</span>
+    </div>
+    <a href="/Django-Project/properties/23/" class="title mt-1">Office floor on main road, 1800 sqft</a>
+    <div class="loc mt-1"><i class="bi bi-geo-alt"></i> Banani, Dhaka</div>
+    <div class="specs">
+      
+        <span><i class="bi bi-arrows-angle-expand"></i>1,800 ft²</span>
+        <span><i class="bi bi-building"></i>Floor 8</span>
+        <span><i class="bi bi-droplet"></i>2 washrooms</span>
+      
+    </div>
+    <div class="foot">
+      <span>
+        <span class="tag-verified fw-bold"><i class="bi bi-patch-check-fill"></i> Verified</span>
+        
+      </span>
+      <span>today</span>
+    </div>
+  </div>
+</article>
+</div><div class="col-md-6 col-lg-4">
+<article class="property-card">
+  <div class="thumb">
+    <a href="/Django-Project/properties/19/">
+      
+        <img src="/Django-Project/media/properties/19/bedroom_1.jpg" alt="Female hostel seat with meals" loading="lazy">
+      
+    </a>
+    <div class="chips">
+      <span class="chip chip-featured"><i class="bi bi-star-fill"></i>Featured</span>
+      <span class="chip"><i class="bi bi-buildings"></i>Hostel / Mess</span>
+      
+      
+    </div>
+    
+    <span class="chip chip-dark photo-count"><i class="bi bi-camera"></i>3</span>
+  </div>
+  <div class="body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+      <div class="price">৳ 6,500 <small>/month</small></div>
+      
+    </div>
+    <a href="/Django-Project/properties/19/" class="title mt-1">Female hostel seat with meals</a>
+    <div class="loc mt-1"><i class="bi bi-geo-alt"></i> Farmgate, Dhaka</div>
+    <div class="specs">
+      
+        <span><i class="bi bi-door-closed"></i>1 Bed</span>
+        <span><i class="bi bi-droplet"></i>1 Bath</span>
+        <span><i class="bi bi-flower1"></i>1 Balcony</span>
+        <span><i class="bi bi-arrows-angle-expand"></i>140 ft²</span>
+      
+    </div>
+    <div class="foot">
+      <span>
+        <span class="tag tag-female"><i class="bi bi-gender-female"></i>Female only</span>
+        
+      </span>
+      <span>today</span>
+    </div>
+  </div>
+</article>
+</div><div class="col-md-6 col-lg-4">
+<article class="property-card">
+  <div class="thumb">
+    <a href="/Django-Project/properties/16/">
+      
+        <img src="/Django-Project/media/properties/16/house_1.jpg" alt="Spacious duplex with private rooftop" loading="lazy">
+      
+    </a>
+    <div class="chips">
+      <span class="chip chip-featured"><i class="bi bi-star-fill"></i>Featured</span>
+      <span class="chip"><i class="bi bi-house-heart"></i>Family</span>
+      
+      
+    </div>
+    
+    <span class="chip chip-dark photo-count"><i class="bi bi-camera"></i>4</span>
+  </div>
+  <div class="body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+      <div class="price">৳ 60,000 <small>/month</small></div>
+      <span class="tag tag-nego">Negotiable</span>
+    </div>
+    <a href="/Django-Project/properties/16/" class="title mt-1">Spacious duplex with private rooftop</a>
+    <div class="loc mt-1"><i class="bi bi-geo-alt"></i> Uttara, Dhaka</div>
+    <div class="specs">
+      
+        <span><i class="bi bi-door-closed"></i>4 Bed</span>
+        <span><i class="bi bi-droplet"></i>4 Bath</span>
+        <span><i class="bi bi-flower1"></i>3 Balcony</span>
+        <span><i class="bi bi-arrows-angle-expand"></i>2,800 ft²</span>
+      
+    </div>
+    <div class="foot">
+      <span>
+        <span class="tag-verified fw-bold"><i class="bi bi-patch-check-fill"></i> Verified</span>
+        
+      </span>
+      <span>today</span>
+    </div>
+  </div>
+</article>
+</div><div class="col-md-6 col-lg-4">
+<article class="property-card">
+  <div class="thumb">
+    <a href="/Django-Project/properties/14/">
+      
+        <img src="/Django-Project/media/properties/14/building_1.jpg" alt="Furnished 3-bed apartment with lake view" loading="lazy">
+      
+    </a>
+    <div class="chips">
+      <span class="chip chip-featured"><i class="bi bi-star-fill"></i>Featured</span>
+      <span class="chip"><i class="bi bi-house-heart"></i>Family</span>
+      
+      
+    </div>
+    
+    <span class="chip chip-dark photo-count"><i class="bi bi-camera"></i>4</span>
+  </div>
+  <div class="body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+      <div class="price">৳ 85,000 <small>/month</small></div>
+      <span class="tag tag-nego">Negotiable</span>
+    </div>
+    <a href="/Django-Project/properties/14/" class="title mt-1">Furnished 3-bed apartment with lake view</a>
+    <div class="loc mt-1"><i class="bi bi-geo-alt"></i> Gulshan, Dhaka</div>
+    <div class="specs">
+      
+        <span><i class="bi bi-door-closed"></i>3 Bed</span>
+        <span><i class="bi bi-droplet"></i>4 Bath</span>
+        <span><i class="bi bi-flower1"></i>3 Balcony</span>
+        <span><i class="bi bi-arrows-angle-expand"></i>2,100 ft²</span>
+      
+    </div>
+    <div class="foot">
+      <span>
+        <span class="tag-verified fw-bold"><i class="bi bi-patch-check-fill"></i> Verified</span>
+        
+      </span>
+      <span>today</span>
+    </div>
+  </div>
+</article>
+</div><div class="col-md-6 col-lg-4">
+<article class="property-card">
+  <div class="thumb">
+    <a href="/Django-Project/properties/13/">
+      
+        <img src="/Django-Project/media/properties/13/building_4.jpg" alt="Sunny 3-bed family flat near Dhanmondi Lake" loading="lazy">
+      
+    </a>
+    <div class="chips">
+      <span class="chip chip-featured"><i class="bi bi-star-fill"></i>Featured</span>
+      <span class="chip"><i class="bi bi-house-heart"></i>Family</span>
+      
+      
+    </div>
+    
+    <span class="chip chip-dark photo-count"><i class="bi bi-camera"></i>4</span>
+  </div>
+  <div class="body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+      <div class="price">৳ 35,000 <small>/month</small></div>
+      
+    </div>
+    <a href="/Django-Project/properties/13/" class="title mt-1">Sunny 3-bed family flat near Dhanmondi Lake</a>
+    <div class="loc mt-1"><i class="bi bi-geo-alt"></i> Dhanmondi, Dhaka</div>
+    <div class="specs">
+      
+        <span><i class="bi bi-door-closed"></i>3 Bed</span>
+        <span><i class="bi bi-droplet"></i>3 Bath</span>
+        <span><i class="bi bi-flower1"></i>2 Balcony</span>
+        <span><i class="bi bi-arrows-angle-expand"></i>1,450 ft²</span>
+      
+    </div>
+    <div class="foot">
+      <span>
+        <span class="tag-verified fw-bold"><i class="bi bi-patch-check-fill"></i> Verified</span>
+        
+      </span>
+      <span>today</span>
+    </div>
+  </div>
+</article>
+</div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="section section-white">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
+      <div><span class="eyebrow">Explore locations</span><h2 class="section-title mt-1 mb-0">Popular areas</h2></div>
+    </div>
+    <div class="row g-3">
+      
+      <div class="col-6 col-lg-3">
+        <a href="/Django-Project/properties/area-banani/" class="area-card">
+          <img src="/Django-Project/media/properties/23/office_1.jpg" alt="Banani" loading="lazy">
+          <div class="info"><div class="t">Banani</div><div class="s">Dhaka · 2 properties</div></div>
+        </a>
+      </div>
+      
+      <div class="col-6 col-lg-3">
+        <a href="/Django-Project/properties/area-agrabad/" class="area-card">
+          <img src="/Django-Project/media/properties/27/building_1.jpg" alt="Agrabad" loading="lazy">
+          <div class="info"><div class="t">Agrabad</div><div class="s">Chattogram · 1 property</div></div>
+        </a>
+      </div>
+      
+      <div class="col-6 col-lg-3">
+        <a href="/Django-Project/properties/area-baridhara/" class="area-card">
+          <img src="/Django-Project/media/properties/25/house_2.jpg" alt="Baridhara" loading="lazy">
+          <div class="info"><div class="t">Baridhara</div><div class="s">Dhaka · 1 property</div></div>
+        </a>
+      </div>
+      
+      <div class="col-6 col-lg-3">
+        <a href="/Django-Project/properties/area-bashundhara/" class="area-card">
+          <img src="/Django-Project/media/properties/21/building_2.jpg" alt="Bashundhara" loading="lazy">
+          <div class="info"><div class="t">Bashundhara</div><div class="s">Dhaka · 1 property</div></div>
+        </a>
+      </div>
+      
+      <div class="col-6 col-lg-3">
+        <a href="/Django-Project/properties/area-dhanmondi/" class="area-card">
+          <img src="/Django-Project/media/properties/13/building_4.jpg" alt="Dhanmondi" loading="lazy">
+          <div class="info"><div class="t">Dhanmondi</div><div class="s">Dhaka · 1 property</div></div>
+        </a>
+      </div>
+      
+      <div class="col-6 col-lg-3">
+        <a href="/Django-Project/properties/area-farmgate/" class="area-card">
+          <img src="/Django-Project/media/properties/19/bedroom_1.jpg" alt="Farmgate" loading="lazy">
+          <div class="info"><div class="t">Farmgate</div><div class="s">Dhaka · 1 property</div></div>
+        </a>
+      </div>
+      
+      <div class="col-6 col-lg-3">
+        <a href="/Django-Project/properties/area-gulshan/" class="area-card">
+          <img src="/Django-Project/media/properties/14/building_1.jpg" alt="Gulshan" loading="lazy">
+          <div class="info"><div class="t">Gulshan</div><div class="s">Dhaka · 1 property</div></div>
+        </a>
+      </div>
+      
+      <div class="col-6 col-lg-3">
+        <a href="/Django-Project/properties/area-lalmatia/" class="area-card">
+          <img src="/Django-Project/media/properties/20/room_1.jpg" alt="Lalmatia" loading="lazy">
+          <div class="info"><div class="t">Lalmatia</div><div class="s">Dhaka · 1 property</div></div>
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
+      <div><span class="eyebrow">Just posted</span><h2 class="section-title mt-1 mb-0">Recently published</h2></div>
+      <a href="/Django-Project/properties/" class="btn btn-outline-primary">View all <i class="bi bi-arrow-right"></i></a>
+    </div>
+    
+    <div class="row g-4">
+      <div class="col-sm-6 col-lg-3">
+<article class="property-card">
+  <div class="thumb">
+    <a href="/Django-Project/properties/28/">
+      
+        <img src="/Django-Project/media/properties/28/room_3.jpg" alt="Bachelor room near Zindabazar" loading="lazy">
+      
+    </a>
+    <div class="chips">
+      
+      <span class="chip"><i class="bi bi-person-badge"></i>Bachelor</span>
+      
+      
+    </div>
+    
+    <span class="chip chip-dark photo-count"><i class="bi bi-camera"></i>3</span>
+  </div>
+  <div class="body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+      <div class="price">৳ 7,000 <small>/month</small></div>
+      <span class="tag tag-nego">Negotiable</span>
+    </div>
+    <a href="/Django-Project/properties/28/" class="title mt-1">Bachelor room near Zindabazar</a>
+    <div class="loc mt-1"><i class="bi bi-geo-alt"></i> Zindabazar, Sylhet</div>
+    <div class="specs">
+      
+        <span><i class="bi bi-door-closed"></i>1 Bed</span>
+        <span><i class="bi bi-droplet"></i>1 Bath</span>
+        
+        <span><i class="bi bi-arrows-angle-expand"></i>180 ft²</span>
+      
+    </div>
+    <div class="foot">
+      <span>
+        <span class="tag tag-male"><i class="bi bi-gender-male"></i>Male only</span>
+        
+      </span>
+      <span>today</span>
+    </div>
+  </div>
+</article>
+</div><div class="col-sm-6 col-lg-3">
+<article class="property-card">
+  <div class="thumb">
+    <a href="/Django-Project/properties/27/">
+      
+        <img src="/Django-Project/media/properties/27/building_1.jpg" alt="2-bed apartment in Agrabad commercial area" loading="lazy">
+      
+    </a>
+    <div class="chips">
+      
+      <span class="chip"><i class="bi bi-house-heart"></i>Family</span>
+      
+      
+    </div>
+    
+    <span class="chip chip-dark photo-count"><i class="bi bi-camera"></i>4</span>
+  </div>
+  <div class="body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+      <div class="price">৳ 20,000 <small>/month</small></div>
+      
+    </div>
+    <a href="/Django-Project/properties/27/" class="title mt-1">2-bed apartment in Agrabad commercial area</a>
+    <div class="loc mt-1"><i class="bi bi-geo-alt"></i> Agrabad, Chattogram</div>
+    <div class="specs">
+      
+        <span><i class="bi bi-door-closed"></i>2 Bed</span>
+        <span><i class="bi bi-droplet"></i>2 Bath</span>
+        
+        <span><i class="bi bi-arrows-angle-expand"></i>1,050 ft²</span>
+      
+    </div>
+    <div class="foot">
+      <span>
+        <span class="tag-verified fw-bold"><i class="bi bi-patch-check-fill"></i> Verified</span>
+        
+      </span>
+      <span>today</span>
+    </div>
+  </div>
+</article>
+</div><div class="col-sm-6 col-lg-3">
+<article class="property-card">
+  <div class="thumb">
+    <a href="/Django-Project/properties/26/">
+      
+        <img src="/Django-Project/media/properties/26/building_4.jpg" alt="Family flat near GEC Circle" loading="lazy">
+      
+    </a>
+    <div class="chips">
+      <span class="chip chip-featured"><i class="bi bi-star-fill"></i>Featured</span>
+      <span class="chip"><i class="bi bi-house-heart"></i>Family</span>
+      
+      
+    </div>
+    
+    <span class="chip chip-dark photo-count"><i class="bi bi-camera"></i>4</span>
+  </div>
+  <div class="body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+      <div class="price">৳ 25,000 <small>/month</small></div>
+      <span class="tag tag-nego">Negotiable</span>
+    </div>
+    <a href="/Django-Project/properties/26/" class="title mt-1">Family flat near GEC Circle</a>
+    <div class="loc mt-1"><i class="bi bi-geo-alt"></i> Nasirabad, Chattogram</div>
+    <div class="specs">
+      
+        <span><i class="bi bi-door-closed"></i>3 Bed</span>
+        <span><i class="bi bi-droplet"></i>2 Bath</span>
+        
+        <span><i class="bi bi-arrows-angle-expand"></i>1,300 ft²</span>
+      
+    </div>
+    <div class="foot">
+      <span>
+        <span class="tag-verified fw-bold"><i class="bi bi-patch-check-fill"></i> Verified</span>
+        
+      </span>
+      <span>today</span>
+    </div>
+  </div>
+</article>
+</div><div class="col-sm-6 col-lg-3">
+<article class="property-card">
+  <div class="thumb">
+    <a href="/Django-Project/properties/25/">
+      
+        <img src="/Django-Project/media/properties/25/house_2.jpg" alt="Full house with garden in Baridhara" loading="lazy">
+      
+    </a>
+    <div class="chips">
+      
+      <span class="chip"><i class="bi bi-house-heart"></i>Family</span>
+      
+      
+    </div>
+    
+    <span class="chip chip-dark photo-count"><i class="bi bi-camera"></i>3</span>
+  </div>
+  <div class="body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+      <div class="price">৳ 150,000 <small>/month</small></div>
+      
+    </div>
+    <a href="/Django-Project/properties/25/" class="title mt-1">Full house with garden in Baridhara</a>
+    <div class="loc mt-1"><i class="bi bi-geo-alt"></i> Baridhara, Dhaka</div>
+    <div class="specs">
+      
+        <span><i class="bi bi-door-closed"></i>5 Bed</span>
+        <span><i class="bi bi-droplet"></i>5 Bath</span>
+        
+        <span><i class="bi bi-arrows-angle-expand"></i>4,200 ft²</span>
+      
+    </div>
+    <div class="foot">
+      <span>
+        <span class="tag-verified fw-bold"><i class="bi bi-patch-check-fill"></i> Verified</span>
+        
+      </span>
+      <span>today</span>
+    </div>
+  </div>
+</article>
+</div><div class="col-sm-6 col-lg-3">
+<article class="property-card">
+  <div class="thumb">
+    <a href="/Django-Project/properties/24/">
+      
+        <img src="/Django-Project/media/properties/24/building_3.jpg" alt="Ground floor shop facing the main road" loading="lazy">
+      
+    </a>
+    <div class="chips">
+      
+      <span class="chip"><i class="bi bi-shop"></i>Shop</span>
+      
+      
+    </div>
+    
+    <span class="chip chip-dark photo-count"><i class="bi bi-camera"></i>2</span>
+  </div>
+  <div class="body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+      <div class="price">৳ 28,000 <small>/month</small></div>
+      <span class="tag tag-nego">Negotiable</span>
+    </div>
+    <a href="/Django-Project/properties/24/" class="title mt-1">Ground floor shop facing the main road</a>
+    <div class="loc mt-1"><i class="bi bi-geo-alt"></i> Mirpur, Dhaka</div>
+    <div class="specs">
+      
+        <span><i class="bi bi-arrows-angle-expand"></i>350 ft²</span>
+        <span><i class="bi bi-building"></i>Ground floor</span>
+        <span><i class="bi bi-droplet"></i>1 washroom</span>
+      
+    </div>
+    <div class="foot">
+      <span>
+        <span class="tag-verified fw-bold"><i class="bi bi-patch-check-fill"></i> Verified</span>
+        
+      </span>
+      <span>today</span>
+    </div>
+  </div>
+</article>
+</div><div class="col-sm-6 col-lg-3">
+<article class="property-card">
+  <div class="thumb">
+    <a href="/Django-Project/properties/23/">
+      
+        <img src="/Django-Project/media/properties/23/office_1.jpg" alt="Office floor on main road, 1800 sqft" loading="lazy">
+      
+    </a>
+    <div class="chips">
+      <span class="chip chip-featured"><i class="bi bi-star-fill"></i>Featured</span>
+      <span class="chip"><i class="bi bi-briefcase"></i>Office</span>
+      
+      
+    </div>
+    
+    <span class="chip chip-dark photo-count"><i class="bi bi-camera"></i>3</span>
+  </div>
+  <div class="body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+      <div class="price">৳ 120,000 <small>/month</small></div>
+      <span class="tag tag-nego">Negotiable</span>
+    </div>
+    <a href="/Django-Project/properties/23/" class="title mt-1">Office floor on main road, 1800 sqft</a>
+    <div class="loc mt-1"><i class="bi bi-geo-alt"></i> Banani, Dhaka</div>
+    <div class="specs">
+      
+        <span><i class="bi bi-arrows-angle-expand"></i>1,800 ft²</span>
+        <span><i class="bi bi-building"></i>Floor 8</span>
+        <span><i class="bi bi-droplet"></i>2 washrooms</span>
+      
+    </div>
+    <div class="foot">
+      <span>
+        <span class="tag-verified fw-bold"><i class="bi bi-patch-check-fill"></i> Verified</span>
+        
+      </span>
+      <span>today</span>
+    </div>
+  </div>
+</article>
+</div><div class="col-sm-6 col-lg-3">
+<article class="property-card">
+  <div class="thumb">
+    <a href="/Django-Project/properties/21/">
+      
+        <img src="/Django-Project/media/properties/21/building_2.jpg" alt="New 3-bed apartment in Bashundhara R/A" loading="lazy">
+      
+    </a>
+    <div class="chips">
+      
+      <span class="chip"><i class="bi bi-house-heart"></i>Family</span>
+      
+      
+    </div>
+    
+    <span class="chip chip-dark photo-count"><i class="bi bi-camera"></i>4</span>
+  </div>
+  <div class="body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+      <div class="price">৳ 32,000 <small>/month</small></div>
+      
+    </div>
+    <a href="/Django-Project/properties/21/" class="title mt-1">New 3-bed apartment in Bashundhara R/A</a>
+    <div class="loc mt-1"><i class="bi bi-geo-alt"></i> Bashundhara, Dhaka</div>
+    <div class="specs">
+      
+        <span><i class="bi bi-door-closed"></i>3 Bed</span>
+        <span><i class="bi bi-droplet"></i>3 Bath</span>
+        
+        <span><i class="bi bi-arrows-angle-expand"></i>1,550 ft²</span>
+      
+    </div>
+    <div class="foot">
+      <span>
+        <span class="tag-verified fw-bold"><i class="bi bi-patch-check-fill"></i> Verified</span>
+        
+      </span>
+      <span>today</span>
+    </div>
+  </div>
+</article>
+</div><div class="col-sm-6 col-lg-3">
+<article class="property-card">
+  <div class="thumb">
+    <a href="/Django-Project/properties/20/">
+      
+        <img src="/Django-Project/media/properties/20/room_1.jpg" alt="Sublet room in quiet family home" loading="lazy">
+      
+    </a>
+    <div class="chips">
+      
+      <span class="chip"><i class="bi bi-door-open"></i>Sublet</span>
+      
+      
+    </div>
+    
+    <span class="chip chip-dark photo-count"><i class="bi bi-camera"></i>3</span>
+  </div>
+  <div class="body">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+      <div class="price">৳ 9,000 <small>/month</small></div>
+      <span class="tag tag-nego">Negotiable</span>
+    </div>
+    <a href="/Django-Project/properties/20/" class="title mt-1">Sublet room in quiet family home</a>
+    <div class="loc mt-1"><i class="bi bi-geo-alt"></i> Lalmatia, Dhaka</div>
+    <div class="specs">
+      
+        <span><i class="bi bi-door-closed"></i>1 Bed</span>
+        <span><i class="bi bi-droplet"></i>1 Bath</span>
+        
+        <span><i class="bi bi-arrows-angle-expand"></i>200 ft²</span>
+      
+    </div>
+    <div class="foot">
+      <span>
+        <span class="tag tag-female"><i class="bi bi-gender-female"></i>Female only</span>
+        
+      </span>
+      <span>today</span>
+    </div>
+  </div>
+</article>
+</div>
+    </div>
+    
+  </div>
+</section>
+
+<section class="section section-white">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-4">
+        <span class="eyebrow">Why Ghorify</span>
+        <h2 class="section-title mt-1">Renting made simple and safe</h2>
+        <p class="text-muted">No more calling ten landlords to find out the real cost, or crossing the city for a flat that was rented last week.</p>
+        <a href="/Django-Project/preview.html" class="btn btn-primary mt-2"><i class="bi bi-stars me-1"></i>Find my match</a>
+      </div>
+      <div class="col-lg-8">
+        <div class="row g-4">
+          <div class="col-md-6"><div class="feature"><span class="ic"><i class="bi bi-patch-check"></i></span><div><h6>Verified landlords</h6><p>Landlords upload their NID and an admin checks it before any listing goes live.</p></div></div></div>
+          <div class="col-md-6"><div class="feature"><span class="ic"><i class="bi bi-receipt"></i></span><div><h6>Real monthly cost</h6><p>Rent, service charge, gas, electricity and water added up, so there are no surprises.</p></div></div></div>
+          <div class="col-md-6"><div class="feature"><span class="ic"><i class="bi bi-stars"></i></span><div><h6>Smart match %</h6><p>Tell us your budget, area and needs. Every home gets a match score.</p></div></div></div>
+          <div class="col-md-6"><div class="feature"><span class="ic"><i class="bi bi-calendar-check"></i></span><div><h6>Book visits online</h6><p>Pick a date and time slot. Once the landlord confirms, the contact number unlocks.</p></div></div></div>
+          <div class="col-md-6"><div class="feature"><span class="ic"><i class="bi bi-layout-three-columns"></i></span><div><h6>Compare side by side</h6><p>Put up to three homes next to each other. The best value is highlighted.</p></div></div></div>
+          <div class="col-md-6"><div class="feature"><span class="ic"><i class="bi bi-flag"></i></span><div><h6>Report fake ads</h6><p>Wrong rent or location? Report it and the admin team takes the listing down.</p></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section pb-0">
+  <div class="container">
+    <div class="cta-band" style="--cta-img:url('/Django-Project/static/img/photos/landlord_cta.jpg')">
+      <div style="max-width:560px">
+        <span class="hero-badge mb-3"><i class="bi bi-gift"></i> Posting is free</span>
+        <h2 class="mb-2">Have a flat, room or shop to rent out?</h2>
+        <p class="mb-4 opacity-75">Post it in minutes, get verified, and receive visit requests from tenants who match what you offer.</p>
+        <a href="/Django-Project/preview.html" class="btn btn-accent btn-lg"><i class="bi bi-plus-lg me-1"></i>Post your property</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+  <footer class="gh-footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <a class="gh-brand mb-3" href="/Django-Project/"><span class="logo"><i class="bi bi-house-door-fill"></i></span><span>Ghor<span class="accent">ify</span></span></a>
+        <p class="mb-3">Flats, rooms, sublets, hostel seats, offices and shops for rent across Bangladesh. Verified landlords, clear monthly costs, easy visit booking.</p>
+        <div class="d-flex gap-2">
+          <span class="btn btn-icon btn-sm" style="background:rgba(255,255,255,.08);color:#fff"><i class="bi bi-facebook"></i></span>
+          <span class="btn btn-icon btn-sm" style="background:rgba(255,255,255,.08);color:#fff"><i class="bi bi-instagram"></i></span>
+          <span class="btn btn-icon btn-sm" style="background:rgba(255,255,255,.08);color:#fff"><i class="bi bi-youtube"></i></span>
+        </div>
+      </div>
+      <div class="col-6 col-lg-2 offset-lg-1">
+        <h6 class="mb-3">Rent by type</h6>
+        <ul class="list-unstyled d-grid gap-2">
+          <li><a href="/Django-Project/properties/cat-family/">Family flats</a></li>
+          <li><a href="/Django-Project/properties/cat-bachelor/">Bachelor</a></li>
+          <li><a href="/Django-Project/properties/cat-sublet/">Sublet</a></li>
+          <li><a href="/Django-Project/properties/cat-hostel/">Hostel / Mess</a></li>
+          <li><a href="/Django-Project/properties/cat-office/">Office</a></li>
+          <li><a href="/Django-Project/properties/cat-shop/">Shop</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h6 class="mb-3">Divisions</h6>
+        <ul class="list-unstyled d-grid gap-2">
+          <li><a href="/Django-Project/properties/div-dhaka/">Dhaka</a></li>
+          <li><a href="/Django-Project/properties/div-chattogram/">Chattogram</a></li>
+          <li><a href="/Django-Project/properties/div-sylhet/">Sylhet</a></li>
+          <li><a href="/Django-Project/properties/div-khulna/">Khulna</a></li>
+          <li><a href="/Django-Project/properties/div-rajshahi/">Rajshahi</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-3">
+        <h6 class="mb-3">For landlords</h6>
+        <ul class="list-unstyled d-grid gap-2">
+          <li><a href="/Django-Project/preview.html">Post a property</a></li>
+          <li><a href="/Django-Project/preview.html">Landlord dashboard</a></li>
+          <li><i class="bi bi-patch-check me-1"></i>Get verified with your NID</li>
+          <li><i class="bi bi-flag me-1"></i>Misleading ads are removed</li>
+        </ul>
+      </div>
+    </div>
+    <hr class="my-4" style="border-color:rgba(255,255,255,.12)">
+    <div class="d-flex flex-wrap justify-content-between small gap-2">
+      <span>&copy; 2026 Ghorify · CSE 302 Project, University of Asia Pacific</span>
+      <span>Photos: Unsplash</span>
+    </div>
+  </div>
+</footer>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/Django-Project/static/js/ghorify.js"></script>
+  
+</body>
+</html>
